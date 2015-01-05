@@ -1,16 +1,47 @@
 $(function(){
+	var thisObj = {};
+
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
 		tabSize: 2,
 		mode: {name: "coffeescript"}
 	});
+	thisObj.editor = editor;
 	var currentGame = "";
 	var currentSaveArray;
-	// attempt to load the game from local storage
-	if(localStorage["games"]){
-		currentSaveArray = JSON.parse(localStorage["games"]);
-		if(currentSaveArray.length > 0)
-			editor.setValue(currentSaveArray[currentSaveArray.length-1].code);
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+	var loadFromGist = function(id){
+        $.ajax('https://api.github.com/gists/'+id, {
+            type: 'GET',
+            context: thisObj
+        }).done(function(data){
+        	this.editor.setValue(data.files['script.coffee'].content);
+        });
+	}
+
+	// attempt to load game from the url parameter
+	var gistToLoad=getParameterByName("hack");
+	if (gistToLoad!==null&&gistToLoad.length>0) {
+		var id = gistToLoad.replace(/[\\\/]/,"");
+		loadFromGist(id);
+		this.editor = editor;
+		editor.doc.setValue("loading...");
+	} else {
+		try {
+			// attempt to load the game from local storage
+			if(localStorage!==undefined && localStorage["games"] !==undefined){
+				currentSaveArray = JSON.parse(localStorage["games"]);
+				if(currentSaveArray.length > 0)
+					editor.setValue(currentSaveArray[currentSaveArray.length-1].code);
+			}
+		} catch(ex) {
+			
+		}
 	}
 	var saveToGist = function(){
 		// should check to make sure game compiles fine before doing this
