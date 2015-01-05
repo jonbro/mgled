@@ -32,8 +32,7 @@ $(function(){
 
 		}).done(function(data){
 			var playUrl = 'http://jonbro.tk/mlged/play.html?p='+data.id;
-			$("#consoletextarea").append('<div>play at <a href="'+playUrl+'">'+playUrl+'</a></div>').click(function(){
-			console.log(data);
+			$("#consoletextarea").append('<div>play at <a href="'+playUrl+'">'+playUrl+'</a></div>');
 		});
 	}
 	// load in all the prior saved games into the dropdown menu
