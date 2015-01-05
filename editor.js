@@ -6,7 +6,7 @@ $(function(){
 		lineNumbers: true,
 		tabSize: 2,
 		mode: {name: "coffeescript"},
-		theme: 'paraiso-dark'
+		theme: 'solarized dark'
 	});
 	thisObj.editor = editor;
 	var setEditorClean = function() {
