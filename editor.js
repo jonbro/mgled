@@ -1,12 +1,20 @@
 $(function(){
 	var thisObj = {};
-
+	var _editorDirty = false;
+	var _editorCleanState = "";
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
 		tabSize: 2,
 		mode: {name: "coffeescript"}
 	});
 	thisObj.editor = editor;
+	var setEditorClean = function() {
+		_editorCleanState = editor.doc.getValue();
+		if (_editorDirty===true) {
+			$("#saveClickLink").html('SAVE');
+			_editorDirty = false;
+		}
+	}
 	var currentGame = "";
 	var currentSaveArray;
     function getParameterByName(name) {
@@ -36,13 +44,16 @@ $(function(){
 			// attempt to load the game from local storage
 			if(localStorage!==undefined && localStorage["games"] !==undefined){
 				currentSaveArray = JSON.parse(localStorage["games"]);
-				if(currentSaveArray.length > 0)
+				if(currentSaveArray.length > 0){
 					editor.setValue(currentSaveArray[currentSaveArray.length-1].code);
+					setEditorClean();
+				}
 			}
 		} catch(ex) {
 			
 		}
 	}
+	// should still populate the array with your games that you have made
 	var saveToGist = function(){
 		// should check to make sure game compiles fine before doing this
 		var gistToCreate = {
@@ -66,6 +77,44 @@ $(function(){
 			$("#consoletextarea").append('<div>play at <a href="'+playUrl+'">'+playUrl+'</a></div>');
 		});
 	}
+	function dateToReadable(title,time) {
+		var year = time.getFullYear();
+		var month = time.getMonth()+1;
+		var date1 = time.getDate();
+		var hour = time.getHours();
+		var minutes = time.getMinutes();
+		var seconds = time.getSeconds();
+
+		if (month < 10) {
+	    	month = "0"+month;
+		}
+		if (date1 < 10) {
+			date1 = "0"+date1;
+		}
+		if (hour < 10) {
+			hour = "0"+hour;
+		}
+		if (minutes < 10) {
+			minutes = "0"+minutes;
+		}
+		if (seconds < 10) {
+			seconds = "0"+seconds;
+		}
+
+		var result = hour+":"+minutes+" "+year + "-" + month+"-"+date1+" "+title;
+		return result;
+	}
+	$('#loadDropDown').change(function(eventData){
+		var val = $( this ).val();
+		for (var i = currentSaveArray.length - 1; i >= 0; i--) {
+			var save = currentSaveArray[i];
+			var key = dateToReadable(save.title, new Date(save.date));
+			if(val == key){
+				editor.doc.setValue(save.code);
+				setEditorClean();
+			}
+		}
+	});
 	// load in all the prior saved games into the dropdown menu
 	// for running the game
 	var populateSaveDropdown = function(){
@@ -81,11 +130,59 @@ $(function(){
 			}
 		}
 		var loadDropDown = $('#loadDropDown');
-		$.each(currentSaveArray, function(i, save){
-			console.log(save);
-			loadDropDown.append('<option>'+save.title+'</option>');
-		});
+		loadDropDown.empty();
+		for (var i = currentSaveArray.length - 1; i >= 0; i--) {
+			var save = currentSaveArray[i];
+			var optionText = '<option class="loadOption">'+dateToReadable(save.title, new Date(save.date))+'</option>';
+			var thisOption = $(optionText);
+			thisOption.value = dateToReadable(save.title, new Date(save.date));
+			loadDropDown.append(thisOption);
+		};
 	}
+	populateSaveDropdown();
+	var saveToStorage = function(){
+		// store the current game into local storage
+		var title = "";
+		title = Config.title.join(" ");
+		if(title == "" || title == 'MGL.COFFEE'){
+			title = 'unnamed';
+		}
+		var currentGame = {
+			title:title,
+			code: editor.doc.getValue(),
+			date: new Date()
+		};
+		if(!currentSaveArray){
+			currentSaveArray = [];
+		}
+		if (currentSaveArray.length>19) {
+			currentSaveArray.splice(0,1);
+		}
+		currentSaveArray.push(currentGame);
+		// only allow 20 things in this list
+
+		localStorage["games"] = JSON.stringify(currentSaveArray);
+		populateSaveDropdown();
+		setEditorClean();
+	}
+	var checkEditorDirty = function(){
+		console.log(_editorCleanState);
+		if (_editorCleanState !== editor.doc.getValue()) {
+			$("#saveClickLink").html('SAVE*');
+			_editorDirty = true;
+		} else {
+			$("#saveClickLink").html('SAVE');
+			_editorDirty = false;
+		}
+	}
+	editor.on('change', function(){
+		checkEditorDirty();
+	});
+	$("#saveClickLink").click(function(){
+		// need to eval to insert stuff into the global namespace, so we can get the name out
+		CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
+		saveToStorage();
+	});
 	$("#shareClickLink").click(function(){
 		saveToGist();
 	});
@@ -96,23 +193,7 @@ $(function(){
 			// would be nice to not compile everything twice, and I am not really sure how much the sandbox is getting me (if anything)
 			CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
 			try{
-				// store the current game into local storage
-				var title = "";
-				title = Config.title.join(" ");
-				if(title == "" || title == 'MGL.COFFEE'){
-					title = 'unnamed';
-				}
-				var currentGame = {
-					title:title,
-					code: editor.doc.getValue(),
-					date: new Date()
-				};
-				if(!currentSaveArray){
-					currentSaveArray = [];
-				}
-				currentSaveArray.push(currentGame);
-				localStorage["games"] = JSON.stringify(currentSaveArray);
-				populateSaveDropdown();
+				saveToStorage();
 				// shouldn't have hit errors, so run the game
 				return Game.initialize();
 			}catch(e){
