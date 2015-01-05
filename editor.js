@@ -5,7 +5,8 @@ $(function(){
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
 		tabSize: 2,
-		mode: {name: "coffeescript"}
+		mode: {name: "coffeescript"},
+		theme: 'paraiso-dark'
 	});
 	thisObj.editor = editor;
 	var setEditorClean = function() {
