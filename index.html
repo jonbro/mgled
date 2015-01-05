@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>MGLScript</title>
+    <script src="./libs/jquery-2.1.1.min.js"></script>
+    <script src="./libs/stacktrace.js"></script>
+    <script src="./libs/source-map.min.js"></script>
+    <script src="./libs/audio.js"></script>
+    <script src="./libs/jsfx.js"></script>
+    <script src="./libs/jsfxlib.js"></script>
+    <script src="./libs/webaudiox.jsfx.js"></script>
+    <script src="./libs/LZWEncoder.js"></script>
+    <script src="./libs/NeuQuant.js"></script>
+    <script src="./libs/GIFEncoder.js"></script>
+    <script src="./libs/b64.js"></script>
+    <script src="./libs/mgl.js"></script>
+    <script src="./libs/coffee-script.js"></script>
+    <script src="./libs/codemirror.js"></script>
+    <script src="./libs/coffeescript_mode.js"></script>
+    <script src="./editor.js"></script>
+    <link rel="stylesheet" href="./css/docs.css">
+    <link rel="stylesheet" href="./css/layout.css"> 
+    <link rel="stylesheet" href="./css/codemirror.css"> 
+</head>
+<body>
+<div id="leftpanel">
+<textarea id="code">
+</textarea>
+</div>
+<div id="verticaldragbar"></div>
+<div id="uppertoolbar">
+    &nbsp;&nbsp;&nbsp;<a href="index.html"><h2>MGLScript</h2></a>
+    <a id="saveClickLink" href="javascript:void(0);">SAVE</a>
+    <form action="" style="display:inline;">
+        <select id="loadDropDown" name="default" style="display:inline; width:100px"> - </select>
+    </form> - 
+    <form action="" style="display:inline;">
+        <select  id="exampleDropdown"  name="default" style="display:inline; width:150px">
+            <option value="sokoban_basic">Load Example</option>
+            <optgroup label="Tutorial">
+            <option value="sokoban_basic">Basic</option>
+            <option value="sokoban_eyeball">Eyeball</option>
+            <option value="sokoban_match3">Match 3</option>
+            <option value="randomrobots">Random Robots</option>
+            <option value="randomspawner">Random Robot Spawner</option>
+            </optgroup>
+            <optgroup label="Elementary">
+            <option value="blockfaker">Block Faker (Droqen)</option>
+            <option value="byyourside">By Your Side (Draknek)</option>
+            <option value="kettle">Kettle (increpare)</option>
+            <option value="microban">Microban (D. Skinner)</option>
+            <option value="nekopuzzle">Neko Puzzle (Lexaloffle)</option>
+            <option value="notsnake">Notsnake (Terry Cavanagh)</option>
+            <option value="zenpuzzlegarden">Zen Puzzle Garden (Lexaloffle)</option>
+            </optgroup>
+            <optgroup label="Intermediate">
+            <option value="limerick">Lime Rick (kissmaj7)</option>
+            <option value="octat">Octat (increpare)</option>
+            <option value="constellationz">Constellation Z (increpare)</option>
+            </optgroup>
+            <optgroup label="Advanced">
+            <option value="midas">Midas (Wanderlands)</option>
+            <option value="whaleworld">2D Whale World (increpare)</option>
+            <option value="blank">Blank Project</option>
+            </optgroup>
+        </select>
+    </form>-
+    <a id="runClickLink">RUN</a>
+    <a id="rebuildClickLink" href="javascript:void('Rebuild without restarting');">REBUILD</a>
+    <a id="shareClickLink" href="javascript:void('Generate Link To Game');">SHARE</a>
+    <a href="Documentation/documentation.html"  target="Puzzle_Script_Documentation">DOCS</a>
+</div>
+<div id="righttophalf"> 
+    <div class="upperarea">
+        <div style="width:100%;max-width:480px" id="displayDiv">
+            <canvas id="display"></canvas>
+        </div>
+    </div>
+</div>
+<div id="horizontaldragbar"></div>
+<div id="rightbottomhalf">
+    <div class="lowertoolbar">
+        <div id="soundbar">
+        </div>
+    </div>
+    <div class="lowerarea" id="lowerarea">
+        <div id = "consoletextarea" >
+=================================<br>
+&nbsp;&nbsp;&nbsp;Log<br>
+=================================<br>
+        </div>
+    </div>
+</div>
+    <script src="./libs/layout.js"></script>
+    <script src="./libs/addlisteners_editor.js"></script>
+
+</body>
