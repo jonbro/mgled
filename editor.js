@@ -80,8 +80,8 @@ $(function(){
     };
     $.ajax('https://api.github.com/gists', {
       type: 'POST',
+      contentType: 'application/json',
       data: JSON.stringify(gistToCreate)
-
     }).done(function(data){
       var playUrl = 'http://jonbro.tk/mlged/play.html?p='+data.id;
       $("#consoletextarea").append('<div>play at <a href="'+playUrl+'">'+playUrl+'</a></div>');
