@@ -43,19 +43,19 @@ window.addEventListener("load", reset_panels, false);
 
 /* https://github.com/ndrake/PuzzleScript/commit/de4ac2a38865b74e66c1d711a25f0691079a290d */
 window.onbeforeunload = function (e) {
-  var e = e || window.event;
-  var msg = 'You have unsaved changes!';
+  // var e = e || window.event;
+  // var msg = 'You have unsaved changes!';
 
-  if(_editorDirty) {      
+  // if(_editorDirty) {      
 
-    // For IE and Firefox prior to version 4
-    if (e) {
-      e.returnValue = msg;
-    }
+  //   // For IE and Firefox prior to version 4
+  //   if (e) {
+  //     e.returnValue = msg;
+  //   }
 
-    // For Safari
-    return msg;
-  }
+  //   // For Safari
+  //   return msg;
+  // }
 };
 
 // var gestureHandler = Mobile.enable();
