@@ -340,10 +340,18 @@ Game = (function() {
   return Game;
 
 })();
-
-requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
-  return window.setTimeout(callback, Game.INTERVAL / 2);
+requestAnimFrameSystem = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+    return window.setTimeout(callback, Game.INTERVAL / 2);
 };
+requestAnimFrame = function(callback){
+  requestAnimFrameSystem(function(){
+    try{
+      callback();
+    }catch(e){
+      ErrorReporter.handleError(e);
+    }
+  });
+}
 
 Display = (function() {
   function Display() {}

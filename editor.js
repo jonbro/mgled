@@ -1,3 +1,33 @@
+var ErrorReporter = (function(){
+  function ErrorReporter() {}
+  ErrorReporter.setSourceMap = function(_sourceMap){
+      this.cssourcemap = _sourceMap;
+      this.parsedMap = JSON.parse(this.cssourcemap.v3SourceMap);
+      this.smc = new sourceMap.SourceMapConsumer(this.parsedMap);
+  };
+  ErrorReporter.setEditorWindow = function(_editor){
+    this.editor = _editor;
+  }
+  ErrorReporter.handleError = function(e){
+      // this fails unless you modify coffee script to something like: sourceURL=file://nothing.js -- because it doesn't handle the coffeescript protocol well
+      var stack = stackinfo(e);
+      // for some reason everything is off by one. yay!
+      var coffeescriptErrorPosition = this.smc.originalPositionFor({
+        line: stack[0].line+1,
+        column: stack[0].column+1
+      });
+      console.log(coffeescriptErrorPosition);
+      var editor = this.editor;
+      $("#consoletextarea").append('<div>error: '+e.message+' at line: ' + coffeescriptErrorPosition.line +'</div>').click(function(){
+        var i = coffeescriptErrorPosition.line;
+        editor.scrollIntoView(Math.max(i - 1 - 10, 0));
+        editor.scrollIntoView(i - 1);
+        editor.focus();
+        editor.setCursor(i - 1, coffeescriptErrorPosition.column);
+      });    
+  }
+  return ErrorReporter;
+})();
 $(function(){
   var thisObj = {};
   var _editorDirty = false;
@@ -17,6 +47,7 @@ $(function(){
     mode: {name: "coffeescript"},
     theme: 'solarized dark'
   });
+  ErrorReporter.setEditorWindow(editor);
   thisObj.editor = editor;
   var setEditorClean = function() {
     _editorCleanState = editor.doc.getValue();
@@ -41,6 +72,19 @@ $(function(){
       this.editor.setValue(data.files['script.coffee'].content);
     });
   }
+  $(window).bind('beforeunload', function (e) {
+    console.log("should be checking for unload");
+    var e = e || window.event;
+    var msg = 'You have unsaved changes!';
+    if(_editorDirty) {      
+      // For IE and Firefox prior to version 4
+      if (e) {
+        e.returnValue = msg;
+      }
+      // For Safari
+      return msg;
+    }
+  });
 
   // attempt to load game from the url parameter
   var gistToLoad=getParameterByName("hack");
@@ -200,34 +244,18 @@ $(function(){
     try{
       var cssourcemap = CoffeeScript.compile(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
       // would be nice to not compile everything twice, and I am not really sure how much the sandbox is getting me (if anything)
+      ErrorReporter.setSourceMap(cssourcemap);
       CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
       try{
         // shouldn't have hit errors, so run the game
         return Game.initialize();
       }catch(e){
-        var parsedMap = JSON.parse(cssourcemap.v3SourceMap);
-        var smc = new sourceMap.SourceMapConsumer(parsedMap);
-        // this fails unless you modify coffee script to something like: sourceURL=file://nothing.js -- because it doesn't handle the coffeescript protocol well
-        var stack = stackinfo(e);
-
-        // for some reason everything is off by one. yay!
-        var coffeescriptErrorPosition = smc.originalPositionFor({
-          line: stack[0].line+1,
-          column: stack[0].column+1
-        });
-        console.log(e, coffeescriptErrorPosition);
-
-        $("#consoletextarea").append('<div>error: '+e.message+' at line: ' + coffeescriptErrorPosition.line +'</div>').click(function(){
-          var i = coffeescriptErrorPosition.line;
-          editor.scrollIntoView(Math.max(i - 1 - 10, 0));
-          editor.scrollIntoView(i - 1);
-          editor.focus();
-          editor.setCursor(i - 1, coffeescriptErrorPosition.column);
-        });
+        console.log('handling error I think?');
+        ErrorReporter.handleError(e);
       }
-    }catch(err){
+    }catch(e){
       // dump errors with links to the correct line out to the console
-      $("#consoletextarea").append('<div>error: '+err.message+'</div>'); // I don't know if this is working right, or why it is working :/ disconcerting!
+      ErrorReporter.handleError(e);
     }
   });
 });
