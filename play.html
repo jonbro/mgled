@@ -62,7 +62,7 @@ canvas {
     }
     function postToLeaderboard(score){
         var scoreboardWindow = $("#leaderboard iframe")[0].contentWindow;
-        scoreboardWindow.postMessage(["addScore", id, 190], "*");        
+        scoreboardWindow.postMessage(["addScore", id, score], "*");        
     }
     $(function(){
         // to store scores on the leaderboard
