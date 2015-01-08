@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>SNUGGLESHIP</title>
+    <title>MGL PLAYER</title>
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -44,11 +44,10 @@ canvas {
 <div class="main">
 <article>
     <section>
-        <div style="width:100%;max-width:480px" id="displayDiv">
+        <div style="width:100%;max-width:480px;float:left" id="displayDiv">
             <canvas id="display"></canvas>
         </div>
-        <div id="leaderboard">
-        </div>
+        <div id="leaderboard" style="float:right"></div>
     </section>
 </article>
 <div id="hacklink"></div>
@@ -74,15 +73,14 @@ canvas {
             console.log("No ID specified in URL.")
             return;
         }
-        $("#hacklink").append("<a href='http://jonbro.tk/mlged/index.html?hack="+id+"'>HACK</a>");
+        $("#hacklink").append("<a href='http://jonbro.tk/mgled/index.html?hack="+id+"'>HACK</a>");
         $.ajax('https://api.github.com/gists/'+id, {
             type: 'GET',
         }).done(function(data){
             CoffeeScript.eval(data.files['script.coffee'].content, {sandbox:true, sourceMap:true, filename:"none"});
             Game.initialize();
             // if the game requested a leaderboard, then attach it
-            $("#leaderboard").append('<iframe src="http://mgled-leaderboard.meteor.com/?id='+id+'">');
-
+            $("#leaderboard").append('<iframe src="http://mgledleaderboard.meteor.com/?p='+id+'">');
         });
     });
     </script>
