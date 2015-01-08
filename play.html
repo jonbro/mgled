@@ -11,7 +11,7 @@
 body {
     background-color: #edc;
     color: #000;
-    width: 100%; max-width: 480px;
+    width: 100%; max-width: 800px;
     margin: 0 auto 0 auto;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -24,6 +24,10 @@ body {
 canvas {
     width: 100%;
     background-color: #000;
+}
+iframe{
+    border:none;
+    height:480px;
 }
     -->
     </style>
@@ -44,10 +48,10 @@ canvas {
 <div class="main">
 <article>
     <section>
-        <div style="width:100%;max-width:480px;float:left" id="displayDiv">
+        <div style="width:480px;max-width:480px;float:left" id="displayDiv">
             <canvas id="display"></canvas>
         </div>
-        <div id="leaderboard" style="float:right"></div>
+        <div id="leaderboard" style="float:right;height:480px;border:none"></div>
     </section>
 </article>
 <div id="hacklink"></div>
@@ -75,7 +79,7 @@ canvas {
             console.log("No ID specified in URL.")
             return;
         }
-        $("#hacklink").append("<a href='http://jonbro.tk/mgled/index.html?hack="+id+"'>HACK</a>");
+        // $("#hacklink").append("<a href='http://jonbro.tk/mgled/index.html?hack="+id+"'>HACK</a>");
         $.ajax('https://api.github.com/gists/'+id, {
             type: 'GET',
         }).done(function(data){
