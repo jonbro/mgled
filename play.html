@@ -53,22 +53,24 @@ canvas {
 <div id="hacklink"></div>
 </div>
     <script type="text/javascript">
+    var id;
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
             results = regex.exec(location.search);
         return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
-    
+    function postToLeaderboard(score){
+        var scoreboardWindow = $("#leaderboard iframe")[0].contentWindow;
+        scoreboardWindow.postMessage(["addScore", id, 190], "*");        
+    }
     $(function(){
         // to store scores on the leaderboard
         /*
-        var scoreboardWindow = $("#leaderboard iframe")[0].contentWindow;
-        scoreboardWindow.postMessage(["addScore", 'thoaeuoaetnuh', 190], "*");
         */
 
         // load the game from gist
-        var id = getParameterByName("p").replace(/[\\\/]/,"");
+        id = getParameterByName("p").replace(/[\\\/]/,"");
         if (id===null||id.length===0) {
             console.log("No ID specified in URL.")
             return;
