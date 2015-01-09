@@ -46,6 +46,15 @@ HTML, BODY
 	background-color: #444444;
 	overflow: hidden;
 }
+#uppertoolbar a
+{
+	margin-right: 10px
+}
+#uppertoolbar select
+{
+	width: 200px;
+	margin-right: 10px;
+}
 .upperarea
 {
 	height: 100%;
@@ -92,4 +101,20 @@ HTML, BODY
 	float: right;
 	height: 3px;
 	cursor: row-resize;
+}
+/* console text */
+#consoletextarea{
+	font-family: monospace;
+	color: white;
+}
+.link {
+	color: yellow;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.error {
+	color: red;
+}
+.notice {
+	color: lightblue;
 }

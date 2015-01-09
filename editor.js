@@ -1,6 +1,44 @@
 var postToLeaderboard = function(score){
   // just a stub
 }
+var EditorConsole = (function(){
+  function EditorConsole(){  
+  }
+  EditorConsole.clear = function(){
+    this.setup();
+    this.console.html("<div>=========================</div>");
+  };
+  EditorConsole.append = function(input){
+    this.setup();
+    return this.console.append(input);
+  }
+  EditorConsole.setEditorWindow = function(_editor){
+    this.editor = _editor;
+  }
+  EditorConsole.setup = function(){
+    if(!this.console)
+      this.console = $("#consoletextarea");    
+  }
+  EditorConsole.appendErrorWithLineLink = function(errorText, line, column){
+    this.setup();
+    var lineText = "<span class='link'>line "+line+"</span>: ";
+    var errorText = "<span class='error'>"+errorText+"</span>";
+    var editor = this.editor;
+    this.console.append('<div>'+lineText+errorText+'</div>').find('.link').click(function(){
+      var i = line;
+      editor.scrollIntoView(Math.max(i - 1 - 10, 0));
+      editor.scrollIntoView(i - 1);
+      editor.focus();
+      editor.setCursor(i - 1, column);
+    });
+  }
+  EditorConsole.appendNotice = function(text){
+    this.setup();
+    this.console.append('<div><span class="notice">'+text+"</span></div>");
+  }
+  return EditorConsole;
+})();
+
 var ErrorReporter = (function(){
   function ErrorReporter() {}
   ErrorReporter.setSourceMap = function(_sourceMap){
@@ -21,13 +59,8 @@ var ErrorReporter = (function(){
       });
       console.log(coffeescriptErrorPosition);
       var editor = this.editor;
-      $("#consoletextarea").append('<div>error: '+e.message+' at line: ' + coffeescriptErrorPosition.line +'</div>').click(function(){
-        var i = coffeescriptErrorPosition.line;
-        editor.scrollIntoView(Math.max(i - 1 - 10, 0));
-        editor.scrollIntoView(i - 1);
-        editor.focus();
-        editor.setCursor(i - 1, coffeescriptErrorPosition.column);
-      });    
+      EditorConsole.clear();
+      EditorConsole.appendErrorWithLineLink(e.message, coffeescriptErrorPosition.line, coffeescriptErrorPosition.column);
   }
   return ErrorReporter;
 })();
@@ -51,6 +84,7 @@ $(function(){
     theme: 'solarized dark'
   });
   ErrorReporter.setEditorWindow(editor);
+  EditorConsole.setEditorWindow(editor);
   thisObj.editor = editor;
   var setEditorClean = function() {
     _editorCleanState = editor.doc.getValue();
@@ -132,7 +166,7 @@ $(function(){
       data: JSON.stringify(gistToCreate)
     }).done(function(data){
       var playUrl = 'http://jonbro.tk/mgled/play.html?p='+data.id;
-      $("#consoletextarea").append('<div>play at <a href="'+playUrl+'">'+playUrl+'</a></div>');
+      EditorConsole.appendNotice('play at <a href="'+playUrl+'">'+playUrl+'</a>');
     });
   }
   function dateToReadable(title,time) {
@@ -218,7 +252,7 @@ $(function(){
     }
     currentSaveArray.push(currentGame);
     // only allow 20 things in this list
-
+    EditorConsole.appendNotice("saved game to local storage");
     localStorage["games"] = JSON.stringify(currentSaveArray);
     populateSaveDropdown();
     setEditorClean();
@@ -237,8 +271,15 @@ $(function(){
   });
   $("#saveClickLink").click(function(){
     // need to eval to insert stuff into the global namespace, so we can get the name out
-    CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
-    saveToStorage();
+    var cssourcemap = CoffeeScript.compile(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
+    // would be nice to not compile everything twice, and I am not really sure how much the sandbox is getting me (if anything)
+    ErrorReporter.setSourceMap(cssourcemap);
+    try{
+      CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
+      saveToStorage();
+    }catch(e){
+      ErrorReporter.handleError(e);
+    }
   });
   $("#shareClickLink").click(function(){
     saveToGist();
@@ -252,6 +293,8 @@ $(function(){
       CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
       try{
         // shouldn't have hit errors, so run the game
+        EditorConsole.clear();
+        EditorConsole.appendNotice('running game');
         Game.initialize();
         resize_all();
       }catch(e){
