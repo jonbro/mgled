@@ -65,6 +65,9 @@ function resize_all(e){
 	
 	winwidth = window.innerWidth;
 	winheight = window.innerHeight;
+	// fix the size of the display window
+	var displaySize = Math.min(480, Math.min($(".upperarea").width(), $(".upperarea").height()));
+	$("#displayDiv canvas").width(displaySize).height(displaySize);
 };
 
 function verticalDragbarMouseDown(e) {

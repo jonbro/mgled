@@ -1,3 +1,6 @@
+var postToLeaderboard = function(score){
+  // just a stub
+}
 var ErrorReporter = (function(){
   function ErrorReporter() {}
   ErrorReporter.setSourceMap = function(_sourceMap){
@@ -70,6 +73,7 @@ $(function(){
       context: thisObj
     }).done(function(data){
       this.editor.setValue(data.files['script.coffee'].content);
+      setEditorClean();
     });
   }
   $(window).bind('beforeunload', function (e) {
@@ -248,7 +252,8 @@ $(function(){
       CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
       try{
         // shouldn't have hit errors, so run the game
-        return Game.initialize();
+        Game.initialize();
+        resize_all();
       }catch(e){
         console.log('handling error I think?');
         ErrorReporter.handleError(e);
