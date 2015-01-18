@@ -86,7 +86,7 @@ iframe{
             CoffeeScript.eval(data.files['script.coffee'].content, {sandbox:true, sourceMap:true, filename:"none"});
             Game.initialize();
             // if the game requested a leaderboard, then attach it
-            $("#leaderboard").append('<iframe src="http://mgledleaderboard.meteor.com/?p='+id+'">');
+            // $("#leaderboard").append('<iframe src="http://mgledleaderboard.meteor.com/?p='+id+'">');
         });
     });
     </script>

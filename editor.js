@@ -223,6 +223,7 @@ $(function(){
     }
     var loadDropDown = $('#loadDropDown');
     loadDropDown.empty();
+    loadDropDown.append('<option class="loadOption">Load</option>');
     for (var i = currentSaveArray.length - 1; i >= 0; i--) {
       var save = currentSaveArray[i];
       var optionText = '<option class="loadOption">'+dateToReadable(save.title, new Date(save.date))+'</option>';
