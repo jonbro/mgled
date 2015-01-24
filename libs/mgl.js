@@ -249,6 +249,7 @@ Game = (function() {
   };
 
   Game.initializeGame = function() {
+    Actor.removeGroups();
     Actor.clear();
     Sound.reset();
     this.fibers = [];
@@ -565,7 +566,9 @@ Actor = (function() {
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     return this.cl.apply(this, args);
   };
-
+  Actor.removeGroups = function(){
+    this.groups = [];
+  };
   Actor.cl = function(targetClasses) {
     var className, g, tc, tcs, _i, _j, _len, _len1, _ref, _results;
     if (targetClasses == null) {

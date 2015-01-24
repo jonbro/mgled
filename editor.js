@@ -81,7 +81,7 @@ $(function(){
     lineNumbers: true,
     tabSize: 2,
     mode: {name: "coffeescript"},
-    theme: 'solarized dark'
+    theme: 'zenburn'
   });
   ErrorReporter.setEditorWindow(editor);
   EditorConsole.setEditorWindow(editor);
