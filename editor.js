@@ -165,7 +165,7 @@ $(function(){
       contentType: 'application/json',
       data: JSON.stringify(gistToCreate)
     }).done(function(data){
-      var playUrl = 'http://jonbro.tk/mgled/play.html?p='+data.id;
+      var playUrl = 'http://mgled.neocities.org/play.html?p='+data.id;
       EditorConsole.appendNotice('play at <a href="'+playUrl+'">'+playUrl+'</a>');
     });
   }

@@ -35,7 +35,14 @@ Function.prototype.classSetter = function(prop, set) {
     configurable: true
   });
 };
-
+RealtimeLeaderboard = (function() {
+  function RealtimeLeaderboard() {}
+  RealtimeLeaderboard.initialize = function(){};
+  RealtimeLeaderboard.beginGame = function(){};
+  RealtimeLeaderboard.setScore = function(){};
+  RealtimeLeaderboard.setTmpScore = function(){};
+  return RealtimeLeaderboard;
+})();
 Game = (function() {
   function Game() {}
 

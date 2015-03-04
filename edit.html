@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>MGLEd</title>
+    <script src="./libs/jquery-2.1.1.min.js"></script>
+    <script src="./libs/stacktrace.js"></script>
+    <script src="./libs/source-map.min.js"></script>
+    <script src="./libs/audio.js"></script>
+    <script src="./libs/jsfx.js"></script>
+    <script src="./libs/jsfxlib.js"></script>
+    <script src="./libs/webaudiox.jsfx.js"></script>
+    <script src="./libs/LZWEncoder.js"></script>
+    <script src="./libs/NeuQuant.js"></script>
+    <script src="./libs/GIFEncoder.js"></script>
+    <script src="./libs/b64.js"></script>
+    <script src="./libs/mgl.js"></script>
+    <script src="./libs/coffee-script.js"></script>
+    <script src="./libs/codemirror.js"></script>
+    <script src="./libs/coffeescript_mode.js"></script>
+    <script src="./editor.js"></script>
+
+    <link rel="stylesheet" href="./css/docs.css">
+    <link rel="stylesheet" href="./css/layout.css"> 
+    <link rel="stylesheet" href="./css/codemirror.css"> 
+    <link rel="stylesheet" href="./css/paraiso-dark.css"> 
+    <link rel="stylesheet" href="./css/solarized.css"> 
+
+</head>
+<body>
+<div id="leftpanel">
+<textarea id="code">
+</textarea>
+</div>
+<div id="verticaldragbar"></div>
+<div id="uppertoolbar">
+    &nbsp;&nbsp;&nbsp;<a href="index.html"><h2>MGLEd</h2></a>
+    <a id="saveClickLink" href="javascript:void(0);">SAVE</a>
+    <form action="" style="display:inline;">
+        <select id="loadDropDown" name="default" style="display:inline;">
+        </select>
+    </form>
+    <form action="" style="display:inline;">
+        <select id="exampleDropDown" name="default" style="display:inline;width:150px">
+            <option>Load Example</option>
+        </select>
+    </form>
+    <a id="runClickLink">RUN</a>
+    <a id="shareClickLink" href="javascript:void('Generate Link To Game');">SHARE</a>
+    <a target="_blank" href="https://github.com/abagames/mgl.coffee">DOCS</a>
+</div>
+<div id="righttophalf"> 
+    <div class="upperarea">
+        <div style="width:100%;max-width:480px;margin:auto;text-align:center;" id="displayDiv">
+            <canvas id="display"></canvas>
+        </div>
+    </div>
+</div>
+<div id="horizontaldragbar"></div>
+<div id="rightbottomhalf">
+    <div class="lowertoolbar">
+        <div id="soundbar">
+        </div>
+    </div>
+    <div class="lowerarea" id="lowerarea">
+        <div id = "consoletextarea" >
+=================================<br>
+&nbsp;&nbsp;&nbsp;Log<br>
+=================================<br>
+        </div>
+    </div>
+</div>
+    <script src="./libs/layout.js"></script>
+    <script src="./libs/addlisteners_editor.js"></script>
+
+</body>
