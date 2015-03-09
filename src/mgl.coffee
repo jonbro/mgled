@@ -53,14 +53,15 @@ class Game
 	@classGetter 't', -> @ticks
 	@classGetter 'sc', -> @score
 	@classSetter 'sc', (v) -> @score = v
-	@classGetter 'ib', -> @gameRunning
+	@classGetter 'isBeginning', -> @running
+	@classGetter 'ib', -> @running
 	@classGetter 'r', -> @random
 
 	# private functions
 	@initialize: ->
 		@ticks = 0
 		@score = 0
-		@gameRunning = false
+		@running = false
 		@random = new Random
 		@INTERVAL = 1000 / Config.fps
 		@delta = 0
@@ -92,7 +93,7 @@ class Game
 		@isPaused = false
 		@postUpdate()
 	@beginTitle: ->
-		@gameRunning = false
+		@running = false
 		ty = if Config.title.length == 1 then .4 else .35
 		new Text(Config.title[0]).xy(.5, ty).sc(3).df
 		if Config.title.length > 1
@@ -100,7 +101,7 @@ class Game
 		new Text('[ CLICK / TOUCH ] TO START').xy(.5, .6).df
 		Mouse.setPressedDisabledCount 10
 	@beginGame: ->
-		@gameRunning = true
+		@running = true
 		@score = 0
 		window.beginGame?()
 		@initializeGame()
@@ -140,7 +141,7 @@ class Game
 		Display.drawText "#{@score}", 1, 0, 1
 		@postUpdate()
 		@ticks++
-		@updateTitle() if !@gameRunning
+		@updateTitle() if !@running
 		if Config.isDebuggingMode
 			@calcFps()
 			Display.drawText "FPS:#{@fps}", 0, 0.97
@@ -340,8 +341,8 @@ class Actor
 	@setter 'way', (v) -> @w = v
 	@getter 'speed', -> @s
 	@setter 'speed', (v) -> @s = v
-	@getter 'ticks', -> @ticks
-	@setter 'ticks', (v) -> @ticks = v
+	@getter 't', -> @ticks
+	@setter 't', (v) -> @ticks = v
 	@getter 'drawing', -> @d
 	@setter 'drawing', (v) -> @d = v
 	@getter 'ir', -> @isRemoving
@@ -947,17 +948,17 @@ class Sound
 		@
 	play: -> @p
 	@getter 'p', ->
-		return @ if !Game.ib || !Sound.isEnabled
+		return @ if !Game.running || !Sound.isEnabled
 		@isPlayingOnce = true
 		@
 	playNow: -> @pn
 	@getter 'pn', ->
-		return @ if !Game.ib || !Sound.isEnabled
+		return @ if !Game.running || !Sound.isEnabled
 		@playLater 0
 		@
 	playPattern: -> @pp
 	@getter 'pp', ->
-		return @ if !Game.ib || !Sound.isEnabled
+		return @ if !Game.running || !Sound.isEnabled
 		@isPlayingLoop = true
 		@scheduledTime = null
 		@
@@ -997,7 +998,7 @@ class Sound
 	@reset: ->
 		s.reset() for s in @s
 	@update: ->
-		return if Game.isPaused || !Game.ib || !@isEnabled
+		return if Game.isPaused || !Game.running || !@isEnabled
 		ct = @c.currentTime
 		tt = ct + @scheduleInterval
 		s.update ct, tt for s in @s
