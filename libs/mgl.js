@@ -378,7 +378,7 @@ Display = (function() {
   function Display() {}
 
   Display.initialize = function() {
-    this.e = $('#display')[0];
+    this.element = $('#display')[0];
     Letter.initialize();
     this.size = new Vector;
     this.setSize();
@@ -395,15 +395,15 @@ Display = (function() {
   Display.setSize = function() {
     var cw;
     cw = $('#displayDiv')[0].clientWidth;
-    Display.e.width = Display.e.height = cw;
+    Display.element.width = Display.element.height = cw;
     Display.size.xy(cw, cw);
-    Display.c = Display.e.getContext('2d');
+    Display.context = Display.element.getContext('2d');
     return Letter.setSize(Display.size);
   };
 
   Display.clear = function() {
-    this.c.fillStyle = Config.backgroundColor;
-    return this.c.fillRect(0, 0, this.size.x, this.size.y);
+    this.context.fillStyle = Config.backgroundColor;
+    return this.context.fillRect(0, 0, this.size.x, this.size.y);
   };
 
   Display.drawText = function(text, x, y, alignX, alignY, color, scale) {
@@ -429,8 +429,8 @@ Display = (function() {
     if (color.rv < 0) {
       return;
     }
-    this.c.fillStyle = color.toString();
-    return this.c.fillRect(floor((x - width / 2) * this.size.x), floor((y - height / 2) * this.size.y), floor(width * this.size.x), floor(height * this.size.y));
+    this.context.fillStyle = color.toString();
+    return this.context.fillRect(floor((x - width / 2) * this.size.x), floor((y - height / 2) * this.size.y), floor(width * this.size.x), floor(height * this.size.y));
   };
 
   Display.fillRectDirect = function(x, y, width, height, color) {
@@ -440,8 +440,8 @@ Display = (function() {
     if (color.rv < 0) {
       return;
     }
-    this.c.fillStyle = color.toString();
-    return this.c.fillRect(x, y, width, height);
+    this.context.fillStyle = color.toString();
+    return this.context.fillRect(x, y, width, height);
   };
 
   Display.beginCapture = function(scale, durationSec, intervalSec) {
@@ -475,7 +475,7 @@ Display = (function() {
   };
 
   Display.capture = function() {
-    this.captureContexts[this.captureCanvasIndex].drawImage(this.e, 0, 0);
+    this.captureContexts[this.captureCanvasIndex].drawImage(this.element, 0, 0);
     this.isCaptured[this.captureCanvasIndex] = true;
     return this.captureCanvasIndex = (this.captureCanvasIndex + 1).lr(0, this.captureDuration);
   };
@@ -1809,12 +1809,12 @@ Mouse = (function() {
     this.p = new Vector().n(.5);
     this.ip = this.ipd = this.wasPressing = this.im = this.wasMoving = false;
     this.pressedDisabledCount = 0;
-    Display.e.addEventListener('mousedown', this.onMouseDown);
-    Display.e.addEventListener('mousemove', this.onMouseMove);
-    Display.e.addEventListener('mouseup', this.onMouseUp);
-    Display.e.addEventListener('touchstart', this.onTouchStart);
-    Display.e.addEventListener('touchmove', this.onTouchMove);
-    return Display.e.addEventListener('touchend', this.onTouchEnd);
+    Display.element.addEventListener('mousedown', this.onMouseDown);
+    Display.element.addEventListener('mousemove', this.onMouseMove);
+    Display.element.addEventListener('mouseup', this.onMouseUp);
+    Display.element.addEventListener('touchstart', this.onTouchStart);
+    Display.element.addEventListener('touchmove', this.onTouchMove);
+    return Display.element.addEventListener('touchend', this.onTouchEnd);
   };
 
   Mouse.onMouseMove = function(e) {

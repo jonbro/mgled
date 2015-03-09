@@ -178,7 +178,7 @@ requestAnimFrame = (callback) ->
 
 class Display
 	@initialize: ->
-		@e = $('#display')[0]
+		@element = $('#display')[0]
 		Letter.initialize()
 		@size = new Vector
 		@setSize()
@@ -187,27 +187,27 @@ class Display
 			@resizeTimer = setTimeout @setSize, 200
 	@setSize: =>
 		cw = $('#displayDiv')[0].clientWidth
-		@e.width = @e.height = cw
+		@element.width = @element.height = cw
 		@size.xy cw, cw
-		@c = @e.getContext '2d'
+		@context = @element.getContext '2d'
 		Letter.setSize @size
 	@clear: ->
-		@c.fillStyle = Config.backgroundColor
-		@c.fillRect 0, 0, @size.x, @size.y
+		@context.fillStyle = Config.backgroundColor
+		@context.fillRect 0, 0, @size.x, @size.y
 	@drawText: (text, x, y, alignX = -1, alignY = -1,
 				color = Color.white, scale = 1) ->
 		Letter.draw text, x, y, alignX, alignY, color, scale
 	@fillRect: (x, y, width, height, color = Color.white) ->
 		return if color.rv < 0
-		@c.fillStyle = color.toString()
-		@c.fillRect floor((x - width / 2) * @size.x),
+		@context.fillStyle = color.toString()
+		@context.fillRect floor((x - width / 2) * @size.x),
 			floor((y - height / 2)* @size.y),
 			floor(width * @size.x),
 			floor(height * @size.y)
 	@fillRectDirect: (x, y, width, height, color = Color.white) ->
 		return if color.rv < 0
-		@c.fillStyle = color.toString()
-		@c.fillRect x, y, width, height
+		@context.fillStyle = color.toString()
+		@context.fillRect x, y, width, height
 	@beginCapture: (scale = 1, durationSec = 3, intervalSec = 0.05) ->
 		@captureDuration = floor durationSec / intervalSec
 		@captureInterval = floor intervalSec * 1000
@@ -226,7 +226,7 @@ class Display
 		@isEndCapturing = false
 		@isCapturing = true
 	@capture: ->
-		@captureContexts[@captureCanvasIndex].drawImage @e, 0, 0
+		@captureContexts[@captureCanvasIndex].drawImage @element, 0, 0
 		@isCaptured[@captureCanvasIndex] = true
 		@captureCanvasIndex =
 			(@captureCanvasIndex + 1).lr 0, @captureDuration
@@ -262,8 +262,8 @@ class Actor
 			if g.name == className
 				return g.s
 		[]
-	@scroll: (args...) -> @sc args...
-	@sc: (targetClasses, ox, oy = 0,
+	@sc: (args...) -> @scroll args...
+	@scroll: (targetClasses, ox, oy = 0,
 		  minX = 0, maxX = 0, minY = 0, maxY = 0) ->
 		tcs =
 			if (targetClasses instanceof Array)
@@ -849,12 +849,12 @@ class Mouse
 		@p = new Vector().n .5
 		@ip = @ipd = @wasPressing = @im = @wasMoving = false
 		@pressedDisabledCount = 0
-		Display.e.addEventListener 'mousedown', @onMouseDown
-		Display.e.addEventListener 'mousemove', @onMouseMove
-		Display.e.addEventListener 'mouseup', @onMouseUp
-		Display.e.addEventListener 'touchstart', @onTouchStart
-		Display.e.addEventListener 'touchmove', @onTouchMove
-		Display.e.addEventListener 'touchend', @onTouchEnd
+		Display.element.addEventListener 'mousedown', @onMouseDown
+		Display.element.addEventListener 'mousemove', @onMouseMove
+		Display.element.addEventListener 'mouseup', @onMouseUp
+		Display.element.addEventListener 'touchstart', @onTouchStart
+		Display.element.addEventListener 'touchmove', @onTouchMove
+		Display.element.addEventListener 'touchend', @onTouchEnd
 	@onMouseMove: (e) =>
 		e.preventDefault()
 		@wasMoving = true
