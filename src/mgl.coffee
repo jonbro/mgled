@@ -612,7 +612,7 @@ class Fiber
 	w: (args...) -> @wait args...
 	n: -> @next
 	r: -> @remove
-	@getter 'isRemoving' -> @removing
+	@getter 'isRemoving', -> @removing
 	@getter 'ir', -> @removing
 
 	# private functions

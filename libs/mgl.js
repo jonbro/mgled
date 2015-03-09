@@ -309,10 +309,10 @@ Game = (function() {
         break;
       }
       f = Game.fibers[i];
-      if (!f.isRemoving) {
+      if (!f.removing) {
         f.update();
       }
-      if (f.isRemoving) {
+      if (f.removing) {
         Game.fibers.splice(i, 1);
       } else {
         i++;
@@ -531,13 +531,13 @@ Actor = (function() {
     return [];
   };
 
-  Actor.scroll = function() {
+  Actor.sc = function() {
     var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.sc.apply(this, args);
+    return this.scroll.apply(this, args);
   };
 
-  Actor.sc = function(targetClasses, ox, oy, minX, maxX, minY, maxY) {
+  Actor.scroll = function(targetClasses, ox, oy, minX, maxX, minY, maxY) {
     var a, actors, tc, tcs, _i, _len, _results;
     if (oy == null) {
       oy = 0;
@@ -920,24 +920,12 @@ ActorGroup = (function() {
 })();
 
 Drawing = (function() {
-  Drawing.prototype.setColor = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.c.apply(this, args);
-  };
-
-  Drawing.prototype.c = function(color) {
+  Drawing.prototype.setColor = function(color) {
     this.color = color;
     return this;
   };
 
-  Drawing.prototype.addRect = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.r.apply(this, args);
-  };
-
-  Drawing.prototype.r = function(width, height, ox, oy) {
+  Drawing.prototype.addRect = function(width, height, ox, oy) {
     if (height == null) {
       height = 0;
     }
@@ -957,17 +945,11 @@ Drawing = (function() {
     if (height === 0) {
       height = width;
     }
-    this.s.push(new DrawingRect(this.color, width, height, ox, oy, this.hasCollision));
+    this.shapes.push(new DrawingRect(this.color, width, height, ox, oy, this.hasCollision));
     return this;
   };
 
-  Drawing.prototype.addRects = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.rs.apply(this, args);
-  };
-
-  Drawing.prototype.rs = function(width, height, ox, oy, way) {
+  Drawing.prototype.addRects = function(width, height, ox, oy, way) {
     var i, n, o, tw, vo, w, _i;
     if (ox == null) {
       ox = 0;
@@ -1001,19 +983,13 @@ Drawing = (function() {
     vo = width;
     width *= 1.05;
     for (i = _i = 1; 1 <= n ? _i <= n : _i >= n; i = 1 <= n ? ++_i : --_i) {
-      this.s.push(new DrawingRect(this.color, width, width, sin(w) * o + ox, cos(w) * o + oy, this.hasCollision));
+      this.shapes.push(new DrawingRect(this.color, width, width, sin(w) * o + ox, cos(w) * o + oy, this.hasCollision));
       o += vo;
     }
     return this;
   };
 
-  Drawing.prototype.addRotate = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.rt.apply(this, args);
-  };
-
-  Drawing.prototype.rt = function(angle, number) {
+  Drawing.prototype.addRotate = function(angle, number) {
     var i, o, w, _i;
     if (number == null) {
       number = 1;
@@ -1024,86 +1000,54 @@ Drawing = (function() {
       o.rt(angle);
       switch (this.lastAdded.type) {
         case 'rect':
-          this.r(this.lastAdded.width, this.lastAdded.height, o.x, o.y);
+          this.addRect(this.lastAdded.width, this.lastAdded.height, o.x, o.y);
           break;
         case 'rects':
           w -= angle;
-          this.rs(this.lastAdded.width, this.lastAdded.height, o.x, o.y, w);
+          this.addRects(this.lastAdded.width, this.lastAdded.height, o.x, o.y, w);
       }
     }
     return this;
   };
 
-  Drawing.prototype.addMirrorX = function() {
-    return this.mx;
-  };
-
-  Drawing.getter('mx', function() {
+  Drawing.getter('addMirrorX', function() {
     switch (this.lastAdded.type) {
       case 'rect':
-        this.r(this.lastAdded.width, this.lastAdded.height, -this.lastAdded.offsetX, this.lastAdded.offsetY);
+        this.addRect(this.lastAdded.width, this.lastAdded.height, -this.lastAdded.offsetX, this.lastAdded.offsetY);
         break;
       case 'rects':
-        this.rs(this.lastAdded.width, this.lastAdded.height, -this.lastAdded.offsetX, this.lastAdded.offsetY, -this.lastAdded.way);
+        this.addRects(this.lastAdded.width, this.lastAdded.height, -this.lastAdded.offsetX, this.lastAdded.offsetY, -this.lastAdded.way);
     }
     return this;
   });
 
-  Drawing.prototype.addMirrorX = function() {
-    return this.my;
-  };
-
-  Drawing.getter('my', function() {
+  Drawing.getter('addMirrorY', function() {
     switch (this.lastAdded.type) {
       case 'rect':
-        this.r(this.lastAdded.width, this.lastAdded.height, this.lastAdded.offsetX, -this.lastAdded.offsetY);
+        this.addRect(this.lastAdded.width, this.lastAdded.height, this.lastAdded.offsetX, -this.lastAdded.offsetY);
         break;
       case 'rects':
-        this.rs(this.lastAdded.width, this.lastAdded.height, this.lastAdded.offsetX, -this.lastAdded.offsetY, -this.lastAdded.way);
+        this.addRects(this.lastAdded.width, this.lastAdded.height, this.lastAdded.offsetX, -this.lastAdded.offsetY, -this.lastAdded.way);
     }
     return this;
   });
 
-  Drawing.prototype.setPos = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.p.apply(this, args);
-  };
-
-  Drawing.prototype.p = function(p) {
+  Drawing.prototype.setPos = function(p) {
     this.pos.v(p);
     return this;
   };
 
-  Drawing.prototype.setXy = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.xy.apply(this, args);
-  };
-
-  Drawing.prototype.xy = function(x, y) {
+  Drawing.prototype.setXy = function(x, y) {
     this.pos.xy(x, y);
     return this;
   };
 
-  Drawing.prototype.setWay = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.w.apply(this, args);
-  };
-
-  Drawing.prototype.w = function(w) {
+  Drawing.prototype.setWay = function(w) {
     this.way = w;
     return this;
   };
 
-  Drawing.prototype.setScale = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.sc.apply(this, args);
-  };
-
-  Drawing.prototype.sc = function(x, y) {
+  Drawing.prototype.setScale = function(x, y) {
     if (y == null) {
       y = -9999999;
     }
@@ -1114,13 +1058,9 @@ Drawing = (function() {
     return this;
   };
 
-  Drawing.prototype.draw = function() {
-    return this.d;
-  };
-
-  Drawing.getter('d', function() {
+  Drawing.getter('draw', function() {
     var r, _i, _len, _ref;
-    _ref = this.s;
+    _ref = this.shapes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       r = _ref[_i];
       r.draw(this);
@@ -1128,31 +1068,17 @@ Drawing = (function() {
     return this;
   });
 
-  Drawing.prototype.enableCollision = function() {
-    return this.ec;
-  };
-
-  Drawing.getter('ec', function() {
+  Drawing.getter('enableCollision', function() {
     this.hasCollision = true;
     return this;
   });
 
-  Drawing.prototype.disableCollision = function() {
-    return this.dc;
-  };
-
-  Drawing.getter('dc', function() {
+  Drawing.getter('disableCollision', function() {
     this.hasCollision = false;
     return this;
   });
 
-  Drawing.prototype.onCollision = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.oc.apply(this, args);
-  };
-
-  Drawing.prototype.oc = function(targetClass, handler) {
+  Drawing.prototype.onCollision = function(targetClass, handler) {
     var cca, collideCheckedActors, isCollided, _i, _len;
     if (handler == null) {
       handler = null;
@@ -1172,17 +1098,91 @@ Drawing = (function() {
     return isCollided;
   };
 
-  Drawing.prototype.clear = function() {
-    return this.cl;
-  };
-
-  Drawing.getter('cl', function() {
-    this.s = [];
+  Drawing.getter('clear', function() {
+    this.shapes = [];
     return this;
   });
 
+  Drawing.prototype.c = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setColor.apply(this, args);
+  };
+
+  Drawing.prototype.r = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.addRect.apply(this, args);
+  };
+
+  Drawing.prototype.rs = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.addRects.apply(this, args);
+  };
+
+  Drawing.prototype.rt = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.addRotate.apply(this, args);
+  };
+
+  Drawing.prototype.mx = function() {
+    return this.addMirrorX;
+  };
+
+  Drawing.prototype.my = function() {
+    return this.addMirrorY;
+  };
+
+  Drawing.prototype.p = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setPos.apply(this, args);
+  };
+
+  Drawing.prototype.xy = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setXy.apply(this, args);
+  };
+
+  Drawing.prototype.w = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setWay.apply(this, args);
+  };
+
+  Drawing.prototype.sc = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setScale.apply(this, args);
+  };
+
+  Drawing.prototype.d = function() {
+    return this.draw;
+  };
+
+  Drawing.prototype.ec = function() {
+    return this.enableCollision;
+  };
+
+  Drawing.prototype.dc = function() {
+    return this.disableCollision;
+  };
+
+  Drawing.prototype.oc = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.onCollision.apply(this, args);
+  };
+
+  Drawing.prototype.cl = function() {
+    return this.clear;
+  };
+
   function Drawing() {
-    this.s = [];
+    this.shapes = [];
     this.pos = new Vector;
     this.way = 0;
     this.scale = new Vector(1, 1);
@@ -1192,7 +1192,7 @@ Drawing = (function() {
 
   Drawing.prototype.updateState = function() {
     var r, _i, _len, _ref;
-    _ref = this.s;
+    _ref = this.shapes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       r = _ref[_i];
       r.updateState(this);
@@ -1203,7 +1203,7 @@ Drawing = (function() {
   Drawing.prototype.isCollided = function(d) {
     var dr, isCollided, r, _i, _j, _len, _len1, _ref, _ref1;
     isCollided = false;
-    _ref = this.s;
+    _ref = this.shapes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       r = _ref[_i];
       _ref1 = d.s;
@@ -1257,24 +1257,12 @@ DrawingRect = (function() {
 })();
 
 Fiber = (function() {
-  Fiber.prototype.doRepeat = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.dr.apply(this, args);
-  };
-
-  Fiber.prototype.dr = function(func) {
+  Fiber.prototype.doRepeat = function(func) {
     this.funcs.push(func);
     return this;
   };
 
-  Fiber.prototype.doOnce = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.d.apply(this, args);
-  };
-
-  Fiber.prototype.d = function(func) {
+  Fiber.prototype.doOnce = function(func) {
     this.funcs.push((function(_this) {
       return function() {
         func.call(_this);
@@ -1284,13 +1272,7 @@ Fiber = (function() {
     return this;
   };
 
-  Fiber.prototype.wait = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.w.apply(this, args);
-  };
-
-  Fiber.prototype.w = function(ticks) {
+  Fiber.prototype.wait = function(ticks) {
     this.funcs.push((function(_this) {
       return function() {
         _this.ticks = ticks;
@@ -1307,33 +1289,55 @@ Fiber = (function() {
     return this;
   };
 
-  Fiber.prototype.next = function() {
-    return this.n;
-  };
-
-  Fiber.getter('n', function() {
+  Fiber.getter('next', function() {
     if (++this.funcIndex >= this.funcs.length) {
       this.funcIndex = 0;
     }
     return this;
   });
 
-  Fiber.prototype.remove = function() {
-    return this.r;
+  Fiber.getter('remove', function() {
+    return this.removing = true;
+  });
+
+  Fiber.prototype.dr = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.doRepeat.apply(this, args);
   };
 
-  Fiber.getter('r', function() {
-    return this.isRemoving = true;
+  Fiber.prototype.d = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.doOnce.apply(this, args);
+  };
+
+  Fiber.prototype.w = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.wait.apply(this, args);
+  };
+
+  Fiber.prototype.n = function() {
+    return this.next;
+  };
+
+  Fiber.prototype.r = function() {
+    return this.remove;
+  };
+
+  Fiber.getter('isRemoving', function() {
+    return this.removing;
   });
 
   Fiber.getter('ir', function() {
-    return this.isRemoving;
+    return this.removing;
   });
 
   function Fiber() {
     this.funcs = [];
     this.funcIndex = 0;
-    this.isRemoving = false;
+    this.removing = false;
   }
 
   Fiber.prototype.update = function() {
