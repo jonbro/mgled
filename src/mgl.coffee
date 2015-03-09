@@ -1,6 +1,5 @@
-Window.Onload = ->
-	# we don't want to start the game immediately, because the editor kicks it off
-	# Game.initialize()
+
+# functions that override property gets and sets with function calls
 
 Function::getter = (prop, get) ->
 	Object.defineProperty @prototype, prop, {get, configurable: yes}
@@ -11,7 +10,7 @@ Function::classGetter = (prop, get) ->
 Function::classSetter = (prop, set) ->
 	Object.defineProperty @, prop, {set, configurable: yes}	
 
-# stub so all of k. cho's games work
+# stub so all of kenta cho's games work
 class RealtimeLeaderboard
 	@initialize: ->
 	@beginGame: ->
@@ -418,10 +417,28 @@ class ActorGroup
 				i++
 		return
 
+
 # drawn character consists of rects
+#
+# Example drawing, draws a yellow square with inset black square
+# ```
+# @drawing
+# 	# set the initial color
+# 	.setColor Color.yellow
+# 	# 'addRect' args: width, height, offsetX, offsetY
+# 	.addRect 0.04, 0.04, 0, 0
+# 	# set the black color
+# 	.setColor Color.dark
+# 	# add an inset square
+# 	.addRect 0.012, 0.012, 0,0
+# ```
+#
 class Drawing
-	# public functions
+	# sets the current drawing color
+	# all rects added after this will use the current color
 	setColor: (@color) -> @
+
+	# add a single rect
 	addRect: (width, height = 0, ox = 0, oy = 0) ->
 		@lastAdded =
 			type: 'rect'
@@ -433,6 +450,8 @@ class Drawing
 		@shapes.push new DrawingRect @color, width, height,
 			ox, oy, @hasCollision
 		@
+		
+	# adds a set of rects that simulates a rotated square
 	addRects: (width, height, ox = 0, oy = 0, way = 0) ->
 		@lastAdded =
 			type: 'rects'

@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>mgl.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>mgl.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>functions that override property gets and sets with function calls</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-attribute">Function</span>::getter = <span class="hljs-function"><span class="hljs-params">(prop, get)</span> -&gt;</span>
+	Object.defineProperty <span class="hljs-property">@prototype</span>, prop, {get, <span class="hljs-attribute">configurable</span>: <span class="hljs-literal">yes</span>}
+<span class="hljs-attribute">Function</span>::setter = <span class="hljs-function"><span class="hljs-params">(prop, set)</span> -&gt;</span>
+	Object.defineProperty <span class="hljs-property">@prototype</span>, prop, {set, <span class="hljs-attribute">configurable</span>: <span class="hljs-literal">yes</span>}	
+<span class="hljs-attribute">Function</span>::classGetter = <span class="hljs-function"><span class="hljs-params">(prop, get)</span> -&gt;</span>
+	Object.defineProperty @, prop, {get, <span class="hljs-attribute">configurable</span>: <span class="hljs-literal">yes</span>}
+<span class="hljs-attribute">Function</span>::classSetter = <span class="hljs-function"><span class="hljs-params">(prop, set)</span> -&gt;</span>
+	Object.defineProperty @, prop, {set, <span class="hljs-attribute">configurable</span>: <span class="hljs-literal">yes</span>}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>stub so all of kenta cho’s games work</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RealtimeLeaderboard</span></span>
+	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+	<span class="hljs-property">@beginGame</span>: <span class="hljs-function">-&gt;</span>
+	<span class="hljs-property">@setScore</span>: <span class="hljs-function">-&gt;</span>
+	<span class="hljs-property">@setTmpScore</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>game state and utility functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Game</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@end</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@e</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'e'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !<span class="hljs-property">@ib</span>
+		<span class="hljs-built_in">window</span>.endGame?()
+		<span class="hljs-property">@beginTitle</span>()
+		<span class="hljs-literal">true</span>
+	<span class="hljs-property">@drawText</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> Display.drawText args...
+	<span class="hljs-property">@dt</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> Display.drawText args...
+	<span class="hljs-property">@fillRect</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> Display.fillRect args...
+	<span class="hljs-property">@fr</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> Display.fillRect args...
+	<span class="hljs-property">@getDifficulty</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@df</span> args...
+	<span class="hljs-property">@df</span>: <span class="hljs-function"><span class="hljs-params">(speed = <span class="hljs-number">1</span>, scale = <span class="hljs-number">1</span>)</span> -&gt;</span> sqrt(<span class="hljs-property">@ticks</span> * speed * <span class="hljs-number">0.0001</span>) * scale + <span class="hljs-number">1</span>
+	<span class="hljs-property">@newDrawing</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nd</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'nd'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Drawing
+	<span class="hljs-property">@newFiber</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nf</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'nf'</span>, <span class="hljs-function">-&gt;</span>
+		f = <span class="hljs-keyword">new</span> Fiber
+		<span class="hljs-property">@fibers</span>.push f
+		f
+	<span class="hljs-property">@newParticle</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@np</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'np'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Particle
+	<span class="hljs-property">@newRandom</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nr</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'nr'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Random
+	<span class="hljs-property">@newSound</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ns</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'ns'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Sound
+	<span class="hljs-property">@newText</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@nt</span> args...
+	<span class="hljs-property">@nt</span>: <span class="hljs-function"><span class="hljs-params">(text)</span> -&gt;</span> <span class="hljs-keyword">new</span> Text text
+	<span class="hljs-property">@newVector</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nv</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'nv'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Vector
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'t'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ticks</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'sc'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@score</span>
+	<span class="hljs-property">@classSetter</span> <span class="hljs-string">'sc'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@score</span> = v
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'isBeginning'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@running</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'ib'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@running</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'r'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@random</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@ticks</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@score</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@running</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-property">@random</span> = <span class="hljs-keyword">new</span> Random
+		<span class="hljs-property">@INTERVAL</span> = <span class="hljs-number">1000</span> / Config.fps
+		<span class="hljs-property">@delta</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@currentTime</span> = <span class="hljs-property">@prevTime</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@isPaused</span> = <span class="hljs-literal">false</span>
+		Display.initialize()
+		Key.initialize()
+		Mouse.initialize()
+		Sound.initialize()
+		<span class="hljs-built_in">window</span>.onblur = <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+			<span class="hljs-property">@isPaused</span> = <span class="hljs-literal">true</span>
+			Display.clear()
+			Display.drawText <span class="hljs-string">'PAUSED'</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+		<span class="hljs-built_in">window</span>.onfocus = <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+			<span class="hljs-property">@onfocus</span>()
+		ca = Config.captureArgs
+		Display.beginCapture.apply Display, ca <span class="hljs-keyword">if</span> ca?
+		<span class="hljs-built_in">window</span>.initialize?()
+		<span class="hljs-keyword">if</span> Config.isDebuggingMode
+			<span class="hljs-property">@beginGame</span>()
+			<span class="hljs-property">@lastFrameTime</span> = <span class="hljs-keyword">new</span> Date().getTime()
+			<span class="hljs-property">@fps</span> = <span class="hljs-property">@fpsCount</span> = <span class="hljs-number">0</span>
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@initializeGame</span>()
+			<span class="hljs-property">@beginTitle</span>()
+		requestAnimFrame <span class="hljs-property">@updateFrame</span>
+	<span class="hljs-property">@onfocus</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> !<span class="hljs-property">@isPaused</span>
+		<span class="hljs-property">@isPaused</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-property">@postUpdate</span>()
+	<span class="hljs-property">@beginTitle</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@running</span> = <span class="hljs-literal">false</span>
+		ty = <span class="hljs-keyword">if</span> Config.title.length == <span class="hljs-number">1</span> <span class="hljs-keyword">then</span> <span class="hljs-number">.4</span> <span class="hljs-keyword">else</span> <span class="hljs-number">.35</span>
+		<span class="hljs-keyword">new</span> Text(Config.title[<span class="hljs-number">0</span>]).xy(<span class="hljs-number">.5</span>, ty).sc(<span class="hljs-number">3</span>).df
+		<span class="hljs-keyword">if</span> Config.title.length &gt; <span class="hljs-number">1</span>
+			<span class="hljs-keyword">new</span> Text(Config.title[<span class="hljs-number">1</span>]).xy(<span class="hljs-number">.5</span>, <span class="hljs-number">.45</span>).sc(<span class="hljs-number">3</span>).df
+		<span class="hljs-keyword">new</span> Text(<span class="hljs-string">'[ CLICK / TOUCH ] TO START'</span>).xy(<span class="hljs-number">.5</span>, <span class="hljs-number">.6</span>).df
+		Mouse.setPressedDisabledCount <span class="hljs-number">10</span>
+	<span class="hljs-property">@beginGame</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@running</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@score</span> = <span class="hljs-number">0</span>
+		<span class="hljs-built_in">window</span>.beginGame?()
+		<span class="hljs-property">@initializeGame</span>()
+	<span class="hljs-property">@initializeGame</span>: <span class="hljs-function">-&gt;</span>
+		Actor.clear()
+		Sound.reset()
+		<span class="hljs-property">@fibers</span> = []
+		<span class="hljs-property">@ticks</span> = <span class="hljs-number">0</span>
+		<span class="hljs-built_in">window</span>.begin?()
+	<span class="hljs-property">@preUpdate</span>: <span class="hljs-function"><span class="hljs-params">(time)</span> -&gt;</span>
+		<span class="hljs-keyword">if</span> time?
+			<span class="hljs-property">@currentTime</span> = time
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@currentTime</span> = <span class="hljs-keyword">new</span> Date().getTime()
+		<span class="hljs-property">@delta</span> += (<span class="hljs-property">@currentTime</span> - <span class="hljs-property">@prevTime</span>) / <span class="hljs-property">@INTERVAL</span>
+		<span class="hljs-property">@prevTime</span> = <span class="hljs-property">@currentTime</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@delta</span> &gt;= <span class="hljs-number">0.75</span>
+		requestAnimFrame <span class="hljs-property">@updateFrame</span>
+		<span class="hljs-literal">false</span>
+	<span class="hljs-property">@updateFrame</span>: <span class="hljs-function"><span class="hljs-params">(time)</span> =&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@isPaused</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> !(<span class="hljs-property">@preUpdate</span> time)
+		Display.preUpdate()
+		Mouse.update()
+		<span class="hljs-built_in">window</span>.update?()
+		Actor.update()
+		Sound.update()
+		i = <span class="hljs-number">0</span>
+		<span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>
+			<span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> i &gt;= <span class="hljs-property">@fibers</span>.length
+			f = <span class="hljs-property">@fibers</span>[i]
+			f.update() <span class="hljs-keyword">if</span> !f.removing
+			<span class="hljs-keyword">if</span> f.removing
+				<span class="hljs-property">@fibers</span>.splice i, <span class="hljs-number">1</span>
+			<span class="hljs-keyword">else</span>
+				i++
+		Display.drawText <span class="hljs-string">"<span class="hljs-subst">#{<span class="hljs-property">@score</span>}</span>"</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+		<span class="hljs-property">@postUpdate</span>()
+		<span class="hljs-property">@ticks</span>++
+		<span class="hljs-property">@updateTitle</span>() <span class="hljs-keyword">if</span> !<span class="hljs-property">@running</span>
+		<span class="hljs-keyword">if</span> Config.isDebuggingMode
+			<span class="hljs-property">@calcFps</span>()
+			Display.drawText <span class="hljs-string">"FPS:<span class="hljs-subst">#{<span class="hljs-property">@fps</span>}</span>"</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.97</span>
+			Display.drawText <span class="hljs-string">"ACTOR#:<span class="hljs-subst">#{Actor.number}</span>"</span>, <span class="hljs-number">0.2</span>, <span class="hljs-number">0.97</span>
+	<span class="hljs-property">@postUpdate</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@delta</span> = <span class="hljs-number">0</span>
+		requestAnimFrame <span class="hljs-property">@updateFrame</span>
+	<span class="hljs-property">@updateTitle</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@beginGame</span>() <span class="hljs-keyword">if</span> Mouse.ipd
+	<span class="hljs-property">@calcFps</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@fpsCount</span>++
+		currentTime = <span class="hljs-keyword">new</span> Date().getTime()
+		delta = currentTime - <span class="hljs-property">@lastFrameTime</span>
+		<span class="hljs-keyword">if</span> delta &gt;= <span class="hljs-number">1000</span>
+			<span class="hljs-property">@fps</span> = floor <span class="hljs-property">@fpsCount</span> * <span class="hljs-number">1000</span> / delta
+			<span class="hljs-property">@lastFrameTime</span> = currentTime
+			<span class="hljs-property">@fpsCount</span> = <span class="hljs-number">0</span>
+
+requestAnimFrameSystem =
+	<span class="hljs-built_in">window</span>.requestAnimationFrame	   ||
+	<span class="hljs-built_in">window</span>.webkitRequestAnimationFrame ||
+	<span class="hljs-built_in">window</span>.mozRequestAnimationFrame	   ||
+	<span class="hljs-built_in">window</span>.oRequestAnimationFrame	   ||
+	<span class="hljs-built_in">window</span>.msRequestAnimationFrame	   ||
+	(callback) -&gt;
+		<span class="hljs-built_in">window</span>.setTimeout callback, Game.INTERVAL / <span class="hljs-number">2</span>
+<span class="hljs-function">
+<span class="hljs-title">requestAnimFrame</span> = <span class="hljs-params">(callback)</span> -&gt;</span>
+	requestAnimFrameSystem -&gt;
+		<span class="hljs-keyword">try</span>
+			callback()
+		<span class="hljs-keyword">catch</span> e
+			 ErrorReporter.handleError e
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Display</span></span>
+	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@element</span> = $(<span class="hljs-string">'#display'</span>)[<span class="hljs-number">0</span>]
+		Letter.initialize()
+		<span class="hljs-property">@size</span> = <span class="hljs-keyword">new</span> Vector
+		<span class="hljs-property">@setSize</span>()
+		<span class="hljs-built_in">window</span>.onresize = <span class="hljs-function">=&gt;</span>
+			clearTimeout <span class="hljs-property">@resizeTimer</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@resizeTimer</span>?
+			<span class="hljs-property">@resizeTimer</span> = setTimeout <span class="hljs-property">@setSize</span>, <span class="hljs-number">200</span>
+	<span class="hljs-property">@setSize</span>: <span class="hljs-function">=&gt;</span>
+		cw = $(<span class="hljs-string">'#displayDiv'</span>)[<span class="hljs-number">0</span>].clientWidth
+		<span class="hljs-property">@element</span>.width = <span class="hljs-property">@element</span>.height = cw
+		<span class="hljs-property">@size</span>.xy cw, cw
+		<span class="hljs-property">@context</span> = <span class="hljs-property">@element</span>.getContext <span class="hljs-string">'2d'</span>
+		Letter.setSize <span class="hljs-property">@size</span>
+	<span class="hljs-property">@clear</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@context</span>.fillStyle = Config.backgroundColor
+		<span class="hljs-property">@context</span>.fillRect <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@size</span>.x, <span class="hljs-property">@size</span>.y
+	<span class="hljs-property">@drawText</span>: (text, x, y, alignX = -<span class="hljs-number">1</span>, alignY = -<span class="hljs-number">1</span>,
+				color = Color.white, scale = <span class="hljs-number">1</span>) -&gt;
+		Letter.draw text, x, y, alignX, alignY, color, scale
+	<span class="hljs-property">@fillRect</span>: <span class="hljs-function"><span class="hljs-params">(x, y, width, height, color = Color.white)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> color.rv &lt; <span class="hljs-number">0</span>
+		<span class="hljs-property">@context</span>.fillStyle = color.toString()
+		<span class="hljs-property">@context</span>.fillRect floor((x - width / <span class="hljs-number">2</span>) * <span class="hljs-property">@size</span>.x),
+			floor((y - height / <span class="hljs-number">2</span>)* <span class="hljs-property">@size</span>.y),
+			floor(width * <span class="hljs-property">@size</span>.x),
+			floor(height * <span class="hljs-property">@size</span>.y)
+	<span class="hljs-property">@fillRectDirect</span>: <span class="hljs-function"><span class="hljs-params">(x, y, width, height, color = Color.white)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> color.rv &lt; <span class="hljs-number">0</span>
+		<span class="hljs-property">@context</span>.fillStyle = color.toString()
+		<span class="hljs-property">@context</span>.fillRect x, y, width, height
+	<span class="hljs-property">@beginCapture</span>: <span class="hljs-function"><span class="hljs-params">(scale = <span class="hljs-number">1</span>, durationSec = <span class="hljs-number">3</span>, intervalSec = <span class="hljs-number">0.05</span>)</span> -&gt;</span>
+		<span class="hljs-property">@captureDuration</span> = floor durationSec / intervalSec
+		<span class="hljs-property">@captureInterval</span> = floor intervalSec * <span class="hljs-number">1000</span>
+		<span class="hljs-property">@captureIntervalTick</span> = floor intervalSec * Config.fps
+		<span class="hljs-property">@captureContexts</span> = []
+		<span class="hljs-property">@isCaptured</span> = []
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.<span class="hljs-property">@captureDuration</span>]
+			cvs = <span class="hljs-built_in">document</span>.createElement <span class="hljs-string">'canvas'</span>
+			cvs.width = <span class="hljs-property">@size</span>.x * scale
+			cvs.height = <span class="hljs-property">@size</span>.y * scale
+			ctx = cvs.getContext <span class="hljs-string">"2d"</span>
+			ctx.scale scale, scale
+			<span class="hljs-property">@captureContexts</span>.push ctx
+			<span class="hljs-property">@isCaptured</span>.push <span class="hljs-literal">false</span>
+		<span class="hljs-property">@captureCanvasIndex</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@isEndCapturing</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-property">@isCapturing</span> = <span class="hljs-literal">true</span>
+	<span class="hljs-property">@capture</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@captureContexts</span>[<span class="hljs-property">@captureCanvasIndex</span>].drawImage <span class="hljs-property">@element</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+		<span class="hljs-property">@isCaptured</span>[<span class="hljs-property">@captureCanvasIndex</span>] = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@captureCanvasIndex</span> =
+			(<span class="hljs-property">@captureCanvasIndex</span> + <span class="hljs-number">1</span>).lr <span class="hljs-number">0</span>, <span class="hljs-property">@captureDuration</span>
+	<span class="hljs-property">@endCapture</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@isCapturing</span> = <span class="hljs-literal">false</span>
+		encoder = <span class="hljs-keyword">new</span> GIFEncoder
+		encoder.setRepeat <span class="hljs-number">0</span>
+		encoder.setDelay <span class="hljs-property">@captureInterval</span>
+		encoder.start()
+		idx = <span class="hljs-property">@captureCanvasIndex</span>
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.<span class="hljs-property">@captureDuration</span>]
+			encoder.addFrame <span class="hljs-property">@captureContexts</span>[idx] <span class="hljs-keyword">if</span> <span class="hljs-property">@isCaptured</span>[idx]
+			idx = (idx + <span class="hljs-number">1</span>).lr <span class="hljs-number">0</span>, <span class="hljs-property">@captureDuration</span>
+		encoder.finish()
+		binaryGif = encoder.stream().getData()
+		<span class="hljs-built_in">window</span>.location.href =
+			<span class="hljs-string">'data:image/gif;base64,'</span> + (encode64 binaryGif)
+	<span class="hljs-property">@preUpdate</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@endCapture</span>() <span class="hljs-keyword">if</span> <span class="hljs-property">@isEndCapturing</span>
+		<span class="hljs-property">@capture</span>() <span class="hljs-keyword">if</span> <span class="hljs-property">@isCapturing</span> &amp;&amp; G.t % <span class="hljs-property">@captureIntervalTick</span> == <span class="hljs-number">0</span>
+		<span class="hljs-property">@clear</span>()
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@isCapturing</span> &amp;&amp; Key.ip[<span class="hljs-number">67</span>]
+			<span class="hljs-property">@drawText</span> <span class="hljs-string">'CAPTURING...'</span>, <span class="hljs-number">.5</span>, <span class="hljs-number">.5</span>, <span class="hljs-number">0</span>
+			<span class="hljs-property">@isEndCapturing</span> = <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>object in the game updated on every frame</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Actor</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@s</span>: <span class="hljs-function"><span class="hljs-params">(targetClass)</span> -&gt;</span>
+		className = (<span class="hljs-string">''</span> + targetClass)
+			.replace <span class="hljs-regexp">/^\s*function\s*([^\(]*)[\S\s]+$/im</span>, <span class="hljs-string">'$1'</span>
+		<span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> <span class="hljs-property">@groups</span>
+			<span class="hljs-keyword">if</span> g.name == className
+				<span class="hljs-keyword">return</span> g.s
+		[]
+	<span class="hljs-property">@sc</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@scroll</span> args...
+	<span class="hljs-property">@scroll</span>: (targetClasses, ox, oy = <span class="hljs-number">0</span>,
+		  minX = <span class="hljs-number">0</span>, maxX = <span class="hljs-number">0</span>, minY = <span class="hljs-number">0</span>, maxY = <span class="hljs-number">0</span>) -&gt;
+		tcs =
+			<span class="hljs-keyword">if</span> (targetClasses <span class="hljs-keyword">instanceof</span> Array)
+				targetClasses
+			<span class="hljs-keyword">else</span>
+				[targetClasses]
+		<span class="hljs-keyword">for</span> tc <span class="hljs-keyword">in</span> tcs
+			actors = <span class="hljs-property">@s</span> tc
+			<span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> actors
+				a.p.x += ox
+				a.p.y += oy
+				a.p.x = a.p.x.lr minX, maxX <span class="hljs-keyword">if</span> minX &lt; maxX
+				a.p.y = a.p.y.lr minY, maxY <span class="hljs-keyword">if</span> minY &lt; maxY
+	<span class="hljs-property">@clear</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@cl</span> args...
+	<span class="hljs-property">@cl</span>: <span class="hljs-function"><span class="hljs-params">(targetClasses = <span class="hljs-literal">null</span>)</span> -&gt;</span>
+		<span class="hljs-property">@groups</span> = [] <span class="hljs-keyword">if</span> !<span class="hljs-property">@groups</span>?
+		<span class="hljs-keyword">if</span> targetClasses == <span class="hljs-literal">null</span>
+			g.clear() <span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> <span class="hljs-property">@groups</span>
+			<span class="hljs-keyword">return</span>
+		tcs =
+			<span class="hljs-keyword">if</span> (targetClasses <span class="hljs-keyword">instanceof</span> Array)
+				targetClasses
+			<span class="hljs-keyword">else</span>
+				[targetClasses]
+		<span class="hljs-keyword">for</span> tc <span class="hljs-keyword">in</span> tcs
+			className = (<span class="hljs-string">''</span> + tc)
+				.replace <span class="hljs-regexp">/^\s*function\s*([^\(]*)[\S\s]+$/im</span>, <span class="hljs-string">'$1'</span>
+			<span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> <span class="hljs-property">@groups</span>
+				g.clear() <span class="hljs-keyword">if</span> g.name == className
+	<span class="hljs-attribute">removeGroups</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@groups</span> = []
+	<span class="hljs-attribute">remove</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@r</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'r'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@isRemoving</span> = <span class="hljs-literal">true</span>
+	<span class="hljs-attribute">setDisplayPriority</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@dp</span> args...
+	<span class="hljs-attribute">dp</span>: <span class="hljs-function"><span class="hljs-params">(displayPriority)</span> -&gt;</span>
+		<span class="hljs-property">@group</span>.displayPriority = displayPriority
+		Actor.sortGroups()
+	<span class="hljs-attribute">onCollision</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@oc</span> args...
+	<span class="hljs-attribute">oc</span>: <span class="hljs-function"><span class="hljs-params">(targetClass, handler = <span class="hljs-literal">null</span>)</span> -&gt;</span>
+		isCollided = <span class="hljs-literal">false</span>
+		collideCheckedActors = Actor.s targetClass
+		<span class="hljs-keyword">for</span> cca <span class="hljs-keyword">in</span> collideCheckedActors
+			<span class="hljs-keyword">if</span> <span class="hljs-property">@d</span>.isCollided cca.d
+				isCollided = <span class="hljs-literal">true</span>
+				handler? cca
+		isCollided
+	<span class="hljs-attribute">newDrawing</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nd</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'nd'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Drawing
+	<span class="hljs-attribute">newFiber</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nf</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'nf'</span>, <span class="hljs-function">-&gt;</span>
+		f = <span class="hljs-keyword">new</span> Fiber
+		f.a = @
+		<span class="hljs-property">@fibers</span>.push f
+		f
+	<span class="hljs-attribute">newParticle</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@np</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'np'</span>, <span class="hljs-function">-&gt;</span>
+		p = <span class="hljs-keyword">new</span> Particle
+		p.p <span class="hljs-property">@p</span>
+		p
+	<span class="hljs-attribute">newRandom</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nr</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'nr'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Random
+	<span class="hljs-attribute">newSound</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ns</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'ns'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Sound
+	<span class="hljs-attribute">newText</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@nt</span> args...
+	<span class="hljs-attribute">nt</span>: <span class="hljs-function"><span class="hljs-params">(text)</span> -&gt;</span>
+		t = <span class="hljs-keyword">new</span> Text text
+		t.p <span class="hljs-property">@p</span>
+		t
+	<span class="hljs-attribute">newVector</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@nv</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'nv'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-keyword">new</span> Vector
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'pos'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@p</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'pos'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@p</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'vel'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@v</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'vel'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@v</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'way'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@w</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'way'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@w</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'speed'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@s</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'speed'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@s</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'t'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ticks</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'t'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@ticks</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'drawing'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@d</span>
+	<span class="hljs-property">@setter</span> <span class="hljs-string">'drawing'</span>, <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-property">@d</span> = v
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'ir'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@isRemoving</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>functions should be overrided
+initialize (called once in the game)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">i</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>begin (called after the Actor is instanced)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">b</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>update (called on every frame)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">u</span>: <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">if</span> Config.isDebuggingMode
+			Actor.number = <span class="hljs-number">0</span>
+			<span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> <span class="hljs-property">@groups</span>
+				g.update()
+				Actor.number += g.s.length
+		<span class="hljs-keyword">else</span>
+			g.update() <span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> <span class="hljs-property">@groups</span>
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-property">@sortGroups</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@groups</span>.sort (v1, v2) -&gt;
+			v1.displayPriority - v2.displayPriority
+	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span>
+		<span class="hljs-property">@i</span> = <span class="hljs-property">@initialize</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@initialize</span>?
+		<span class="hljs-property">@b</span> = <span class="hljs-property">@begin</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@begin</span>?
+		<span class="hljs-property">@u</span> = <span class="hljs-property">@update</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@update</span>?
+		<span class="hljs-property">@p</span> = <span class="hljs-keyword">new</span> Vector
+		<span class="hljs-property">@v</span> = <span class="hljs-keyword">new</span> Vector
+		<span class="hljs-property">@w</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@s</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@ticks</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@d</span> = <span class="hljs-keyword">new</span> Drawing
+		<span class="hljs-property">@fibers</span> = []
+		<span class="hljs-property">@isRemoving</span> = <span class="hljs-literal">false</span>
+		className = (<span class="hljs-string">''</span> + <span class="hljs-property">@constructor</span>)
+			.replace <span class="hljs-regexp">/^\s*function\s*([^\(]*)[\S\s]+$/im</span>, <span class="hljs-string">'$1'</span>
+		<span class="hljs-keyword">for</span> g <span class="hljs-keyword">in</span> Actor.groups
+			<span class="hljs-keyword">if</span> g.name == className
+				<span class="hljs-property">@group</span> = g
+				<span class="hljs-keyword">break</span>
+		<span class="hljs-keyword">if</span> !<span class="hljs-property">@group</span>?
+			<span class="hljs-property">@group</span> = <span class="hljs-keyword">new</span> ActorGroup className
+			Actor.groups.push <span class="hljs-property">@group</span>
+			Actor.sortGroups()
+			<span class="hljs-property">@i</span>()
+		<span class="hljs-property">@group</span>.s.push @
+		<span class="hljs-property">@b</span> args...
+	<span class="hljs-attribute">postUpdate</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@p</span>.a <span class="hljs-property">@v</span>
+		<span class="hljs-property">@p</span>.aw <span class="hljs-property">@w</span>, <span class="hljs-property">@s</span>
+		f.update() <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> <span class="hljs-property">@fibers</span>
+		<span class="hljs-property">@d</span>.p(<span class="hljs-property">@p</span>).w(<span class="hljs-property">@w</span>).d
+		<span class="hljs-property">@ticks</span>++
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ActorGroup</span></span>
+	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@name</span>)</span> -&gt;</span>
+		<span class="hljs-property">@clear</span>()
+		<span class="hljs-property">@displayPriority</span> = <span class="hljs-number">1</span>
+	<span class="hljs-attribute">clear</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@s</span> = []
+	<span class="hljs-attribute">update</span>: <span class="hljs-function">-&gt;</span>
+		i = <span class="hljs-number">0</span>
+		<span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>
+			<span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> i &gt;= <span class="hljs-property">@s</span>.length
+			a = <span class="hljs-property">@s</span>[i]
+			a.u() <span class="hljs-keyword">if</span> !a.isRemoving
+			<span class="hljs-keyword">if</span> a.isRemoving
+				<span class="hljs-property">@s</span>.splice i, <span class="hljs-number">1</span>
+			<span class="hljs-keyword">else</span>
+				a.postUpdate()
+				i++
+		<span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>drawn character consists of rects</p>
+<p>Example drawing, draws a yellow square with inset black square</p>
+<pre><code><span class="hljs-property">@drawing</span>
+    <span class="hljs-comment"># set the initial color</span>
+    .setColor Color.yellow
+    <span class="hljs-comment"># 'addRect' args: width, height, offsetX, offsetY</span>
+    .addRect <span class="hljs-number">0.04</span>, <span class="hljs-number">0.04</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+    <span class="hljs-comment"># set the black color</span>
+    .setColor Color.dark
+    <span class="hljs-comment"># add an inset square</span>
+    .addRect <span class="hljs-number">0.012</span>, <span class="hljs-number">0.012</span>, <span class="hljs-number">0</span>,<span class="hljs-number">0</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Drawing</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>sets the current drawing color
+all rects added after this will use the current color</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">setColor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@color</span>)</span> -&gt;</span> @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>add a single rect</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">addRect</span>: <span class="hljs-function"><span class="hljs-params">(width, height = <span class="hljs-number">0</span>, ox = <span class="hljs-number">0</span>, oy = <span class="hljs-number">0</span>)</span> -&gt;</span>
+		<span class="hljs-property">@lastAdded</span> =
+			<span class="hljs-attribute">type</span>: <span class="hljs-string">'rect'</span>
+			<span class="hljs-attribute">width</span>: width
+			<span class="hljs-attribute">height</span>: height
+			<span class="hljs-attribute">offsetX</span>: ox
+			<span class="hljs-attribute">offsetY</span>: oy
+		height = width <span class="hljs-keyword">if</span> height == <span class="hljs-number">0</span>
+		<span class="hljs-property">@shapes</span>.push <span class="hljs-keyword">new</span> DrawingRect <span class="hljs-property">@color</span>, width, height,
+			ox, oy, <span class="hljs-property">@hasCollision</span>
+		@</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>adds a set of rects that simulates a rotated square</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">addRects</span>: <span class="hljs-function"><span class="hljs-params">(width, height, ox = <span class="hljs-number">0</span>, oy = <span class="hljs-number">0</span>, way = <span class="hljs-number">0</span>)</span> -&gt;</span>
+		<span class="hljs-property">@lastAdded</span> =
+			<span class="hljs-attribute">type</span>: <span class="hljs-string">'rects'</span>
+			<span class="hljs-attribute">width</span>: width
+			<span class="hljs-attribute">height</span>: height
+			<span class="hljs-attribute">offsetX</span>: ox
+			<span class="hljs-attribute">offsetY</span>: oy
+			<span class="hljs-attribute">way</span>: way
+		w = way * PI / <span class="hljs-number">180</span>
+		<span class="hljs-keyword">if</span> width &gt; height
+			w += PI / <span class="hljs-number">2</span>
+			tw = width
+			width = height
+			height = tw
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> width &lt; <span class="hljs-number">0.01</span>
+		n = floor height / width
+		o = -width * (n - <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>
+		vo = width
+		width *= <span class="hljs-number">1.05</span>
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.n]
+			<span class="hljs-property">@shapes</span>.push <span class="hljs-keyword">new</span> DrawingRect <span class="hljs-property">@color</span>, width, width,
+				sin(w) * o + ox, cos(w) * o + oy, <span class="hljs-property">@hasCollision</span>
+			o += vo
+		@
+	<span class="hljs-attribute">addRotate</span>: <span class="hljs-function"><span class="hljs-params">(angle, number = <span class="hljs-number">1</span>)</span> -&gt;</span>
+		o = <span class="hljs-keyword">new</span> Vector().xy <span class="hljs-property">@lastAdded</span>.offsetX, <span class="hljs-property">@lastAdded</span>.offsetY
+		w = <span class="hljs-property">@lastAdded</span>.way
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.number]
+			o.rt angle
+			<span class="hljs-keyword">switch</span> <span class="hljs-property">@lastAdded</span>.type
+				<span class="hljs-keyword">when</span> <span class="hljs-string">'rect'</span>
+					<span class="hljs-property">@addRect</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height, o.x, o.y
+				<span class="hljs-keyword">when</span> <span class="hljs-string">'rects'</span>
+					w -= angle
+					<span class="hljs-property">@addRects</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height, o.x, o.y, w
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'addMirrorX'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">switch</span> <span class="hljs-property">@lastAdded</span>.type
+			<span class="hljs-keyword">when</span> <span class="hljs-string">'rect'</span>
+				<span class="hljs-property">@addRect</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height,
+					-<span class="hljs-property">@lastAdded</span>.offsetX, <span class="hljs-property">@lastAdded</span>.offsetY
+			<span class="hljs-keyword">when</span> <span class="hljs-string">'rects'</span>
+				<span class="hljs-property">@addRects</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height,
+					-<span class="hljs-property">@lastAdded</span>.offsetX, <span class="hljs-property">@lastAdded</span>.offsetY,
+					-<span class="hljs-property">@lastAdded</span>.way
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'addMirrorY'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">switch</span> <span class="hljs-property">@lastAdded</span>.type
+			<span class="hljs-keyword">when</span> <span class="hljs-string">'rect'</span>
+				<span class="hljs-property">@addRect</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height,
+					<span class="hljs-property">@lastAdded</span>.offsetX, -<span class="hljs-property">@lastAdded</span>.offsetY
+			<span class="hljs-keyword">when</span> <span class="hljs-string">'rects'</span>
+				<span class="hljs-property">@addRects</span> <span class="hljs-property">@lastAdded</span>.width, <span class="hljs-property">@lastAdded</span>.height,
+					<span class="hljs-property">@lastAdded</span>.offsetX, -<span class="hljs-property">@lastAdded</span>.offsetY,
+					-<span class="hljs-property">@lastAdded</span>.way
+		@
+	<span class="hljs-attribute">setPos</span>: <span class="hljs-function"><span class="hljs-params">(p)</span> -&gt;</span>
+		<span class="hljs-property">@pos</span>.v p
+		@
+	<span class="hljs-attribute">setXy</span>: <span class="hljs-function"><span class="hljs-params">(x, y)</span> -&gt;</span>
+		<span class="hljs-property">@pos</span>.xy x, y
+		@
+	<span class="hljs-attribute">setWay</span>: <span class="hljs-function"><span class="hljs-params">(w)</span> -&gt;</span>
+		<span class="hljs-property">@way</span> = w
+		@
+	<span class="hljs-attribute">setScale</span>: <span class="hljs-function"><span class="hljs-params">(x, y = -<span class="hljs-number">9999999</span>)</span> -&gt;</span>
+		y = x <span class="hljs-keyword">if</span> y == -<span class="hljs-number">9999999</span> 
+		<span class="hljs-property">@scale</span>.xy x, y
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'draw'</span>, <span class="hljs-function">-&gt;</span>
+		r.draw @ <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-property">@shapes</span>
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'enableCollision'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@hasCollision</span> = <span class="hljs-literal">true</span>
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'disableCollision'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@hasCollision</span> = <span class="hljs-literal">false</span>
+		@
+	<span class="hljs-attribute">onCollision</span>: <span class="hljs-function"><span class="hljs-params">(targetClass, handler = <span class="hljs-literal">null</span>)</span> -&gt;</span>
+		<span class="hljs-property">@updateState</span>()
+		isCollided = <span class="hljs-literal">false</span>
+		collideCheckedActors = Actor.s targetClass
+		<span class="hljs-keyword">for</span> cca <span class="hljs-keyword">in</span> collideCheckedActors
+			<span class="hljs-keyword">if</span> <span class="hljs-property">@isCollided</span> cca.d
+				isCollided = <span class="hljs-literal">true</span>
+				handler? cca
+		isCollided
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'clear'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@shapes</span> = []
+		@</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>shorthand functions
+grouped so that we can delete them easier later</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">c</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setColor</span> args...
+	<span class="hljs-attribute">r</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@addRect</span> args...
+	<span class="hljs-attribute">rs</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@addRects</span> args...
+	<span class="hljs-attribute">rt</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@addRotate</span> args...
+	<span class="hljs-attribute">mx</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@addMirrorX</span>
+	<span class="hljs-attribute">my</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@addMirrorY</span>
+	<span class="hljs-attribute">p</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setPos</span> args...
+	<span class="hljs-attribute">xy</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setXy</span> args...
+	<span class="hljs-attribute">w</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setWay</span> args...
+	<span class="hljs-attribute">sc</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setScale</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@draw</span>
+	<span class="hljs-attribute">ec</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@enableCollision</span>
+	<span class="hljs-attribute">dc</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@disableCollision</span>
+	<span class="hljs-attribute">oc</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@onCollision</span> args...
+	<span class="hljs-attribute">cl</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@clear</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@shapes</span> = []
+		<span class="hljs-property">@pos</span> = <span class="hljs-keyword">new</span> Vector
+		<span class="hljs-property">@way</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@scale</span> = <span class="hljs-keyword">new</span> Vector <span class="hljs-number">1</span>, <span class="hljs-number">1</span>
+		<span class="hljs-property">@hasCollision</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@color</span> = Color.white
+	<span class="hljs-attribute">updateState</span>: <span class="hljs-function">-&gt;</span> 
+		r.updateState @ <span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-property">@shapes</span>
+		@
+	<span class="hljs-attribute">isCollided</span>: <span class="hljs-function"><span class="hljs-params">(d)</span> -&gt;</span>
+		isCollided = <span class="hljs-literal">false</span>
+		<span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> <span class="hljs-property">@shapes</span>
+			<span class="hljs-keyword">for</span> dr <span class="hljs-keyword">in</span> d.s
+				isCollided = <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> r.isCollided dr
+		isCollided
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DrawingRect</span></span>
+	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@color</span>, width, height, ox, oy, <span class="hljs-property">@hasCollision</span>)</span> -&gt;</span>
+		<span class="hljs-property">@size</span> = <span class="hljs-keyword">new</span> Vector width, height
+		<span class="hljs-property">@offset</span> = <span class="hljs-keyword">new</span> Vector ox, oy
+		<span class="hljs-property">@currentPos</span> = <span class="hljs-keyword">new</span> Vector
+		<span class="hljs-property">@currentSize</span> = <span class="hljs-keyword">new</span> Vector
+	<span class="hljs-attribute">updateState</span>: <span class="hljs-function"><span class="hljs-params">(d)</span> -&gt;</span>
+		<span class="hljs-property">@currentPos</span>.v <span class="hljs-property">@offset</span>
+		<span class="hljs-property">@currentPos</span>.x *= d.scale.x
+		<span class="hljs-property">@currentPos</span>.y *= d.scale.y
+		<span class="hljs-property">@currentPos</span>.rt d.way
+		<span class="hljs-property">@currentPos</span>.a d.pos
+		<span class="hljs-property">@currentSize</span>.xy <span class="hljs-property">@size</span>.x * d.scale.x, <span class="hljs-property">@size</span>.y * d.scale.y
+	<span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">(d)</span> -&gt;</span>
+		<span class="hljs-property">@updateState</span> d
+		Display.fillRect <span class="hljs-property">@currentPos</span>.x, <span class="hljs-property">@currentPos</span>.y,
+			<span class="hljs-property">@currentSize</span>.x, <span class="hljs-property">@currentSize</span>.y, <span class="hljs-property">@color</span>
+	<span class="hljs-attribute">isCollided</span>: <span class="hljs-function"><span class="hljs-params">(r)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !<span class="hljs-property">@hasCollision</span> || !r.hasCollision
+		(abs <span class="hljs-property">@currentPos</span>.x - r.currentPos.x) &lt;
+			(<span class="hljs-property">@currentSize</span>.x + r.currentSize.x) / <span class="hljs-number">2</span> &amp;&amp;
+			(abs <span class="hljs-property">@currentPos</span>.y - r.currentPos.y) &lt;
+			(<span class="hljs-property">@currentSize</span>.y + r.currentSize.y) / <span class="hljs-number">2</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>lightweight thread</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Fiber</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">doRepeat</span>: <span class="hljs-function"><span class="hljs-params">(func)</span> -&gt;</span>
+		<span class="hljs-property">@funcs</span>.push func
+		@
+	<span class="hljs-attribute">doOnce</span>: <span class="hljs-function"><span class="hljs-params">(func)</span> -&gt;</span>
+		<span class="hljs-property">@funcs</span>.push =&gt;
+			func.call @
+			<span class="hljs-property">@n</span>
+		@
+	<span class="hljs-attribute">wait</span>: <span class="hljs-function"><span class="hljs-params">(ticks)</span> -&gt;</span>
+		<span class="hljs-property">@funcs</span>.push =&gt;
+			<span class="hljs-property">@ticks</span> = ticks
+			<span class="hljs-property">@n</span>
+		<span class="hljs-property">@funcs</span>.push =&gt;
+			<span class="hljs-property">@n</span> <span class="hljs-keyword">if</span> --<span class="hljs-property">@ticks</span> &lt; <span class="hljs-number">0</span>
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'next'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@funcIndex</span> = <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> ++<span class="hljs-property">@funcIndex</span> &gt;= <span class="hljs-property">@funcs</span>.length
+		@
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'remove'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@removing</span> = <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>shorthand/compatibility functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">dr</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@doRepeat</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@doOnce</span> args...
+	<span class="hljs-attribute">w</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@wait</span> args...
+	<span class="hljs-attribute">n</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@next</span>
+	<span class="hljs-attribute">r</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@remove</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'isRemoving'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@removing</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'ir'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@removing</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@funcs</span> = []
+		<span class="hljs-property">@funcIndex</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@removing</span> = <span class="hljs-literal">false</span>
+	<span class="hljs-attribute">update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@funcs</span>[<span class="hljs-property">@funcIndex</span>].call @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>rgb color</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Color</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@rv</span>, <span class="hljs-property">@gv</span>, <span class="hljs-property">@bv</span>)</span> -&gt;</span>
+	<span class="hljs-property">@d</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@dark</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@r</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@red</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@g</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@green</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@b</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@blue</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@y</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@yellow</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>
+	<span class="hljs-property">@m</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@magenta</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@c</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@cyan</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@w</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@white</span>: <span class="hljs-keyword">new</span> Color <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@ticks</span>: <span class="hljs-keyword">new</span> Color -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>
+	<span class="hljs-property">@transparent</span>: <span class="hljs-keyword">new</span> Color -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">toString</span>: <span class="hljs-function">-&gt;</span>
+		v1 = <span class="hljs-number">250</span>
+		v0 = <span class="hljs-number">0</span>
+		r = floor(<span class="hljs-property">@rv</span> * v1 + v0)
+		g = floor(<span class="hljs-property">@gv</span> * v1 + v0)
+		b = floor(<span class="hljs-property">@bv</span> * v1 + v0)
+		<span class="hljs-string">"rgb(<span class="hljs-subst">#{r}</span>,<span class="hljs-subst">#{g}</span>,<span class="hljs-subst">#{b}</span>)"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>letters drawn on the display</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Text</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">setPos</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@p</span> args...
+	<span class="hljs-attribute">p</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.p.v pos
+		@
+	<span class="hljs-attribute">setXy</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@xy</span> args...
+	<span class="hljs-attribute">xy</span>: <span class="hljs-function"><span class="hljs-params">(x, y)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.p.xy x, y
+		@
+	<span class="hljs-attribute">setVelocity</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@v</span> args...
+	<span class="hljs-attribute">v</span>: <span class="hljs-function"><span class="hljs-params">(x, y)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.v.xy x, y
+		@
+	<span class="hljs-attribute">setDuration</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@d</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function"><span class="hljs-params">(duration)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.duration = duration
+		@
+	<span class="hljs-attribute">displayedForever</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@df</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'df'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@a</span>.duration = <span class="hljs-number">9999999</span>
+		@
+	<span class="hljs-attribute">alignLeft</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@al</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'al'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@a</span>.xAlign = -<span class="hljs-number">1</span>
+		@
+	<span class="hljs-attribute">alignRight</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ar</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'ar'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@a</span>.xAlign = <span class="hljs-number">1</span>
+		@
+	<span class="hljs-attribute">setColor</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@c</span> args...
+	<span class="hljs-attribute">c</span>: <span class="hljs-function"><span class="hljs-params">(color)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.color = color
+		@
+	<span class="hljs-attribute">setScale</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@sc</span> args...
+	<span class="hljs-attribute">sc</span>: <span class="hljs-function"><span class="hljs-params">(scale)</span> -&gt;</span>
+		<span class="hljs-property">@a</span>.scale = scale
+		@
+	<span class="hljs-attribute">showOnce</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@so</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'so'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">if</span> (Text.shownTexts.indexOf <span class="hljs-property">@a</span>.text) &gt;= <span class="hljs-number">0</span>
+			<span class="hljs-property">@a</span>.text = <span class="hljs-string">''</span>
+			<span class="hljs-property">@a</span>.r
+		<span class="hljs-keyword">else</span>
+			Text.shownTexts.push <span class="hljs-property">@a</span>.text
+		@
+	<span class="hljs-attribute">remove</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@r</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'r'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@a</span>.r</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(text)</span> -&gt;</span>
+		<span class="hljs-property">@a</span> = <span class="hljs-keyword">new</span> TextActor
+		<span class="hljs-property">@a</span>.text = text
+	<span class="hljs-property">@shownTexts</span>: []
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TextActor</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Actor</span></span>
+	<span class="hljs-attribute">initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@setDisplayPriority</span> <span class="hljs-number">2</span>
+	<span class="hljs-attribute">begin</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@duration</span> = <span class="hljs-number">1</span>
+		<span class="hljs-property">@xAlign</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@color</span> = Color.white
+		<span class="hljs-property">@scale</span> = <span class="hljs-number">1</span>
+	<span class="hljs-attribute">update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@v</span>.d <span class="hljs-property">@duration</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@ticks</span> == <span class="hljs-number">0</span>
+		Display.drawText <span class="hljs-property">@text</span>, <span class="hljs-property">@p</span>.x, <span class="hljs-property">@p</span>.y, <span class="hljs-property">@xAlign</span>, <span class="hljs-number">0</span>, <span class="hljs-property">@color</span>, <span class="hljs-property">@scale</span>
+		<span class="hljs-property">@r</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@ticks</span> &gt;= <span class="hljs-property">@duration</span> - <span class="hljs-number">1</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Letter</span></span>
+	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@COUNT</span> = <span class="hljs-number">66</span>
+		patterns = [
+			<span class="hljs-number">0x4644AAA4</span>, <span class="hljs-number">0x6F2496E4</span>, <span class="hljs-number">0xF5646949</span>, <span class="hljs-number">0x167871F4</span>, <span class="hljs-number">0x2489F697</span>,
+			<span class="hljs-number">0xE9669696</span>, <span class="hljs-number">0x79F99668</span>, <span class="hljs-number">0x91967979</span>, <span class="hljs-number">0x1F799976</span>, <span class="hljs-number">0x1171FF17</span>,
+			<span class="hljs-number">0xF99ED196</span>, <span class="hljs-number">0xEE444E99</span>, <span class="hljs-number">0x53592544</span>, <span class="hljs-number">0xF9F11119</span>, <span class="hljs-number">0x9DDB9999</span>,
+			<span class="hljs-number">0x79769996</span>, <span class="hljs-number">0x7ED99611</span>, <span class="hljs-number">0x861E9979</span>, <span class="hljs-number">0x994444E7</span>, <span class="hljs-number">0x46699699</span>,
+			<span class="hljs-number">0x6996FD99</span>, <span class="hljs-number">0xF4469999</span>, <span class="hljs-number">0x2224F248</span>, <span class="hljs-number">0x26244424</span>, <span class="hljs-number">0x64446622</span>,
+			<span class="hljs-number">0x84284248</span>, <span class="hljs-number">0x40F0F024</span>, <span class="hljs-number">0x0F0044E4</span>, <span class="hljs-number">0x480A4E40</span>, <span class="hljs-number">0x9A459124</span>,
+			<span class="hljs-number">0x000A5A16</span>, <span class="hljs-number">0x640444F0</span>, <span class="hljs-number">0x80004049</span>, <span class="hljs-number">0x40400004</span>, <span class="hljs-number">0x44444040</span>,
+			<span class="hljs-number">0x0AA00044</span>, <span class="hljs-number">0x6476E400</span>, <span class="hljs-number">0xFAFA61D9</span>, <span class="hljs-number">0xE44E4EAA</span>, <span class="hljs-number">0x24F42445</span>,
+			<span class="hljs-number">0xF244E544</span>, <span class="hljs-number">0x00000042</span>
+			]
+		p = <span class="hljs-number">0</span>
+		d = <span class="hljs-number">32</span>
+		pIndex = <span class="hljs-number">0</span>
+		<span class="hljs-property">@dotPatterns</span> = []
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.<span class="hljs-property">@COUNT</span>]
+			dots = []
+			<span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span><span class="hljs-number">.5</span>]
+				<span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span><span class="hljs-number">.4</span>]
+					<span class="hljs-keyword">if</span> ++d &gt;= <span class="hljs-number">32</span>
+						p = patterns[pIndex++]
+						d = <span class="hljs-number">0</span>
+					dots.push <span class="hljs-keyword">new</span> Vector().xy k, j <span class="hljs-keyword">if</span> p &amp; <span class="hljs-number">1</span> &gt; <span class="hljs-number">0</span>
+					p &gt;&gt;= <span class="hljs-number">1</span>
+			<span class="hljs-property">@dotPatterns</span>.push dots
+		charStr = <span class="hljs-string">"()[]&lt;&gt;=+-*/%&amp;_!?,.:|'\"$@#\\urdl"</span>
+		<span class="hljs-property">@charToIndex</span> = []
+		<span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span><span class="hljs-number">.127</span>]
+			li = <span class="hljs-keyword">if</span> c == <span class="hljs-number">32</span>
+				-<span class="hljs-number">1</span>
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-number">48</span> &lt;= c &lt; <span class="hljs-number">58</span>
+				c - <span class="hljs-number">48</span>
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-number">65</span> &lt;= c &lt; <span class="hljs-number">90</span>
+				c - <span class="hljs-number">65</span> + <span class="hljs-number">10</span>
+			<span class="hljs-keyword">else</span>
+				ci = charStr.indexOf (String.fromCharCode c)
+				<span class="hljs-keyword">if</span> ci &gt;= <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> ci + <span class="hljs-number">36</span> <span class="hljs-keyword">else</span> -<span class="hljs-number">2</span>
+			<span class="hljs-property">@charToIndex</span>.push li
+	<span class="hljs-property">@setSize</span>: <span class="hljs-function"><span class="hljs-params">(size)</span> -&gt;</span>
+		<span class="hljs-property">@baseDotSize</span> = floor((min size.x, size.y) / <span class="hljs-number">250</span> + <span class="hljs-number">1</span>).c <span class="hljs-number">1</span>, <span class="hljs-number">20</span>
+	<span class="hljs-property">@draw</span>: <span class="hljs-function"><span class="hljs-params">(text, x, y, xAlign, yAlign, color, scale)</span> -&gt;</span>
+		tx = floor x * Display.size.x
+		ty = floor y * Display.size.y
+		size = <span class="hljs-property">@baseDotSize</span> * scale
+		lw = size * <span class="hljs-number">5</span>
+		<span class="hljs-keyword">if</span> xAlign == <span class="hljs-number">0</span>
+			tx -= floor text.length * lw / <span class="hljs-number">2</span>
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> xAlign == <span class="hljs-number">1</span>
+			tx -= floor text.length * lw
+		ty -= floor size * <span class="hljs-number">3.5</span> <span class="hljs-keyword">if</span> yAlign == <span class="hljs-number">0</span>
+		<span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> text
+			li = <span class="hljs-property">@charToIndex</span>[c.charCodeAt <span class="hljs-number">0</span>]
+			<span class="hljs-keyword">if</span> li &gt;= <span class="hljs-number">0</span>
+				<span class="hljs-property">@drawDots</span> li, tx, ty, color, size
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> li == -<span class="hljs-number">2</span>
+				<span class="hljs-keyword">throw</span> <span class="hljs-string">"invalid char: <span class="hljs-subst">#{c}</span>"</span>
+			tx += lw
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-property">@drawDots</span>: <span class="hljs-function"><span class="hljs-params">(li, x, y, color, size)</span> -&gt;</span>
+		<span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> <span class="hljs-property">@dotPatterns</span>[li]
+			Display.fillRectDirect x + p.x * size, y + p.y * size,
+				size, size, color
+		<span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>particle effect</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Particle</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">setPos</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@p</span> args...
+	<span class="hljs-attribute">p</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@pos</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setXy</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@xy</span> args...
+	<span class="hljs-attribute">xy</span>: <span class="hljs-function"><span class="hljs-params">(x, y)</span> -&gt;</span>
+		<span class="hljs-property">@pos</span> = <span class="hljs-keyword">new</span> Vector().xy x, y
+		@
+	<span class="hljs-attribute">setNumber</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@n</span> args...
+	<span class="hljs-attribute">n</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@number</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setWay</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@w</span> args...
+	<span class="hljs-attribute">w</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@way</span>, <span class="hljs-property">@wayWidth</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setSpeed</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@s</span> args...
+	<span class="hljs-attribute">s</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@speed</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setColor</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@c</span> args...
+	<span class="hljs-attribute">c</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@color</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setSize</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@sz</span> args...
+	<span class="hljs-attribute">sz</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@size</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setDuration</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@d</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@duration</span>)</span> -&gt;</span> @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@a</span> = <span class="hljs-keyword">new</span> ParticleActor
+		<span class="hljs-property">@a</span>.particle = @
+		<span class="hljs-property">@number</span> = <span class="hljs-number">1</span>
+		<span class="hljs-property">@way</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@wayWidth</span> = <span class="hljs-number">360</span>
+		<span class="hljs-property">@speed</span> = <span class="hljs-number">0.01</span>
+		<span class="hljs-property">@color</span> = Color.white
+		<span class="hljs-property">@size</span> = <span class="hljs-number">0.02</span>
+		<span class="hljs-property">@duration</span> = <span class="hljs-number">30</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ParticleActor</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Actor</span></span>
+	<span class="hljs-attribute">initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@setDisplayPriority</span> <span class="hljs-number">0</span>
+	<span class="hljs-attribute">update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@particle</span>?
+			<span class="hljs-property">@r</span>
+			pp = <span class="hljs-property">@particle</span>
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> pp.number &lt; <span class="hljs-number">1</span>
+			ww = pp.wayWidth / <span class="hljs-number">2</span>
+			<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.pp.number]
+				p = <span class="hljs-keyword">new</span> ParticleActor
+				p.p.v pp.pos
+				p.v.aw pp.way + ((-ww).rr ww),
+					pp.speed * (<span class="hljs-number">0.5</span>.rr <span class="hljs-number">1.5</span>)
+				p.color = pp.color
+				p.size = pp.size
+				p.duration = pp.duration * (<span class="hljs-number">0.5</span>.rr <span class="hljs-number">1.5</span>)
+			<span class="hljs-keyword">return</span>
+		Display.fillRect <span class="hljs-property">@p</span>.x, <span class="hljs-property">@p</span>.y, <span class="hljs-property">@size</span>, <span class="hljs-property">@size</span>, <span class="hljs-property">@color</span>
+		<span class="hljs-property">@r</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@ticks</span> &gt;= <span class="hljs-property">@duration</span> - <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>mouse/touch position and event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Mouse</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'pos'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@p</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'isPressing'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ip</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'isPressed'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ipd</span>
+	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'isMoving'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@im</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@p</span> = <span class="hljs-keyword">new</span> Vector().n <span class="hljs-number">.5</span>
+		<span class="hljs-property">@ip</span> = <span class="hljs-property">@ipd</span> = <span class="hljs-property">@wasPressing</span> = <span class="hljs-property">@im</span> = <span class="hljs-property">@wasMoving</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-property">@pressedDisabledCount</span> = <span class="hljs-number">0</span>
+		Display.element.addEventListener <span class="hljs-string">'mousedown'</span>, <span class="hljs-property">@onMouseDown</span>
+		Display.element.addEventListener <span class="hljs-string">'mousemove'</span>, <span class="hljs-property">@onMouseMove</span>
+		Display.element.addEventListener <span class="hljs-string">'mouseup'</span>, <span class="hljs-property">@onMouseUp</span>
+		Display.element.addEventListener <span class="hljs-string">'touchstart'</span>, <span class="hljs-property">@onTouchStart</span>
+		Display.element.addEventListener <span class="hljs-string">'touchmove'</span>, <span class="hljs-property">@onTouchMove</span>
+		Display.element.addEventListener <span class="hljs-string">'touchend'</span>, <span class="hljs-property">@onTouchEnd</span>
+	<span class="hljs-property">@onMouseMove</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		e.preventDefault()
+		<span class="hljs-property">@wasMoving</span> = <span class="hljs-literal">true</span>
+		rect = e.target.getBoundingClientRect()
+		<span class="hljs-property">@p</span>.x = ((e.pageX - rect.left) / Display.size.x).c <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+		<span class="hljs-property">@p</span>.y = ((e.pageY - rect.top) / Display.size.y).c <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@onMouseDown</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		<span class="hljs-property">@ip</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@onMouseMove</span> e
+		G.onfocus()
+	<span class="hljs-property">@onMouseUp</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		<span class="hljs-property">@ip</span> = <span class="hljs-literal">false</span>
+	<span class="hljs-property">@onTouchMove</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		e.preventDefault()
+		<span class="hljs-property">@wasMoving</span> = <span class="hljs-literal">true</span>
+		rect = e.target.getBoundingClientRect()
+		touch = e.touches[<span class="hljs-number">0</span>]
+		<span class="hljs-property">@p</span>.x = ((touch.pageX - rect.left) / Display.size.x).c <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+		<span class="hljs-property">@p</span>.y = ((touch.pageY - rect.top) / Display.size.y).c <span class="hljs-number">0</span>, <span class="hljs-number">1</span>
+	<span class="hljs-property">@onTouchStart</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		<span class="hljs-property">@ip</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@onTouchMove</span> e
+		G.onfocus()
+	<span class="hljs-property">@onTouchEnd</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+		<span class="hljs-property">@ip</span> = <span class="hljs-literal">false</span>		
+	<span class="hljs-property">@update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@ipd</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@ip</span>
+			<span class="hljs-keyword">if</span> !<span class="hljs-property">@wasPressing</span>
+				<span class="hljs-property">@ipd</span> = <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@pressedDisabledCount</span> &lt;= <span class="hljs-number">0</span>
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@pressedDisabledCount</span>--
+		<span class="hljs-property">@wasPressing</span> = <span class="hljs-property">@ip</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@wasMoving</span>
+			<span class="hljs-property">@im</span> = <span class="hljs-literal">true</span>
+			<span class="hljs-property">@wasMoving</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@im</span> = <span class="hljs-literal">false</span>
+	<span class="hljs-property">@setPressedDisabledCount</span>: <span class="hljs-function"><span class="hljs-params">(c)</span> -&gt;</span>
+		<span class="hljs-property">@pressedDisabledCount</span> = c
+		<span class="hljs-property">@ipd</span> = <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>key pressing event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Key</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@classGetter</span> <span class="hljs-string">'isPressing'</span>, <span class="hljs-function">-&gt;</span> <span class="hljs-property">@ip</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@ip</span> = (<span class="hljs-literal">false</span> <span class="hljs-keyword">for</span> [<span class="hljs-number">0.</span><span class="hljs-number">.255</span>])
+		<span class="hljs-built_in">window</span>.onkeydown = <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+			<span class="hljs-property">@ip</span>[e.keyCode] = <span class="hljs-literal">true</span>
+			e.preventDefault() <span class="hljs-keyword">if</span> <span class="hljs-number">37</span> &lt;= e.keyCode &lt;= <span class="hljs-number">40</span>
+		<span class="hljs-built_in">window</span>.onkeyup = <span class="hljs-function"><span class="hljs-params">(e)</span> =&gt;</span>
+			<span class="hljs-property">@ip</span>[e.keyCode] = <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>sound effect and bgm</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Sound</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@setSeed</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@sd</span> args...
+	<span class="hljs-property">@sd</span>: <span class="hljs-function"><span class="hljs-params">(seed)</span> -&gt;</span>
+		<span class="hljs-property">@random</span>.sd seed
+	<span class="hljs-property">@setQuantize</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@q</span> args...
+	<span class="hljs-property">@q</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@quantize</span> = <span class="hljs-number">1</span>)</span> -&gt;</span>
+	<span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span>
+		Sound.s.push @
+		<span class="hljs-property">@volume</span> = <span class="hljs-number">1</span>
+	<span class="hljs-attribute">setVolume</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@v</span> args...
+	<span class="hljs-attribute">v</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@volume</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setParam</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@pr</span> args...
+	<span class="hljs-attribute">pr</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@param</span>)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> !Sound.isEnabled
+		<span class="hljs-property">@param</span>[<span class="hljs-number">2</span>] *= <span class="hljs-property">@volume</span>
+		<span class="hljs-property">@buffer</span> = WebAudiox.getBufferFromJsfx Sound.c, <span class="hljs-property">@param</span>
+		@
+	<span class="hljs-attribute">changeParam</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@cpr</span> args...
+	<span class="hljs-attribute">cpr</span>: <span class="hljs-function"><span class="hljs-params">(index, ratio)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> !Sound.isEnabled
+		<span class="hljs-property">@param</span>[index] *= ratio		
+		<span class="hljs-property">@buffer</span> = WebAudiox.getBufferFromJsfx Sound.c, <span class="hljs-property">@param</span>
+		@
+	<span class="hljs-attribute">setDrum</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@d</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function"><span class="hljs-params">(seed = <span class="hljs-number">0</span>)</span> -&gt;</span>
+		<span class="hljs-property">@pr</span> (Sound.generateDrumParam seed)
+		@
+	<span class="hljs-attribute">setPattern</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@pt</span> args...
+	<span class="hljs-attribute">pt</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@pattern</span>, <span class="hljs-property">@patternInterval</span> = <span class="hljs-number">0.25</span>)</span> -&gt;</span> @
+	<span class="hljs-attribute">setDrumPattern</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@dp</span> args...
+	<span class="hljs-attribute">dp</span>: <span class="hljs-function"><span class="hljs-params">(seed = <span class="hljs-number">0</span>, patternInterval = <span class="hljs-number">0.25</span>)</span> -&gt;</span>
+		<span class="hljs-property">@pt</span> (Sound.generateDrumPattern seed), patternInterval
+		@
+	<span class="hljs-attribute">play</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@p</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'p'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> !Game.running || !Sound.isEnabled
+		<span class="hljs-property">@isPlayingOnce</span> = <span class="hljs-literal">true</span>
+		@
+	<span class="hljs-attribute">playNow</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pn</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'pn'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> !Game.running || !Sound.isEnabled
+		<span class="hljs-property">@playLater</span> <span class="hljs-number">0</span>
+		@
+	<span class="hljs-attribute">playPattern</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@pp</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'pp'</span>, <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> !Game.running || !Sound.isEnabled
+		<span class="hljs-property">@isPlayingLoop</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-property">@scheduledTime</span> = <span class="hljs-literal">null</span>
+		@
+	<span class="hljs-property">@generateParam</span>: <span class="hljs-function"><span class="hljs-params">(seed, params, mixRatio = <span class="hljs-number">0.5</span>)</span> -&gt;</span>
+		random = <span class="hljs-keyword">if</span> seed != <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">new</span> Random(seed) <span class="hljs-keyword">else</span> <span class="hljs-property">@random</span>
+		psl = params.length
+		i = random.ri <span class="hljs-number">0</span>, psl - <span class="hljs-number">1</span>
+		p = params[i].concat()
+		pl = p.length
+		<span class="hljs-keyword">while</span> random.r() &lt; mixRatio
+			ci = random.ri <span class="hljs-number">0</span>, psl - <span class="hljs-number">1</span>
+			cp = params[ci]
+			<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.pl - <span class="hljs-number">1</span>]
+				rt = random.r()
+				p[i] = p[i] * rt + cp[i] * (<span class="hljs-number">1</span> - rt)
+		p</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-property">@initialize</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">try</span>
+			<span class="hljs-property">@c</span> = <span class="hljs-keyword">new</span> AudioContext
+			<span class="hljs-property">@gn</span> = Sound.c.createGain()
+			<span class="hljs-property">@gn</span>.gain.value = Config.soundVolume
+			<span class="hljs-property">@gn</span>.connect Sound.c.destination
+			<span class="hljs-property">@isEnabled</span> = <span class="hljs-literal">true</span>
+		<span class="hljs-keyword">catch</span> error
+			<span class="hljs-property">@isEnabled</span> = <span class="hljs-literal">false</span>
+		<span class="hljs-property">@playInterval</span> = <span class="hljs-number">60</span> / Config.soundTempo
+		<span class="hljs-property">@scheduleInterval</span> = <span class="hljs-number">1</span> / Config.fps * <span class="hljs-number">2</span>
+		<span class="hljs-property">@quantize</span> = <span class="hljs-number">0.5</span>
+		<span class="hljs-property">@clear</span>()
+		<span class="hljs-property">@initDrumParams</span>()
+		<span class="hljs-property">@initDrumPatterns</span>()
+		<span class="hljs-property">@random</span> = <span class="hljs-keyword">new</span> Random
+	<span class="hljs-property">@clear</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@s</span> = []
+	<span class="hljs-property">@reset</span>: <span class="hljs-function">-&gt;</span>
+		s.reset() <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> <span class="hljs-property">@s</span>
+	<span class="hljs-property">@update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> Game.isPaused || !Game.running || !<span class="hljs-property">@isEnabled</span>
+		ct = <span class="hljs-property">@c</span>.currentTime
+		tt = ct + <span class="hljs-property">@scheduleInterval</span>
+		s.update ct, tt <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> <span class="hljs-property">@s</span>
+	<span class="hljs-property">@initDrumParams</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@drumParams</span> = [
+			[<span class="hljs-string">"sine"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1740</span>,<span class="hljs-number">0.1500</span>,<span class="hljs-number">0.2780</span>,<span class="hljs-number">20</span>,<span class="hljs-number">528</span>,<span class="hljs-number">2400</span>,-<span class="hljs-number">0.6680</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.0100</span>,<span class="hljs-number">0.0003</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.5000</span>,-<span class="hljs-number">0.2600</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1000</span>,<span class="hljs-number">0.0900</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1240</span>,<span class="hljs-number">0</span>]
+			[<span class="hljs-string">"square"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1</span>,<span class="hljs-number">20</span>,<span class="hljs-number">400</span>,<span class="hljs-number">2000</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.5</span>,-<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.5</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.75</span>,-<span class="hljs-number">1</span>]
+			[<span class="hljs-string">"noise"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1</span>,<span class="hljs-number">1300</span>,<span class="hljs-number">500</span>,<span class="hljs-number">2400</span>,<span class="hljs-number">1</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">40</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.75</span>,<span class="hljs-number">0.25</span>,<span class="hljs-number">1</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0.25</span>,-<span class="hljs-number">1</span>]
+			[<span class="hljs-string">"noise"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.05</span>,<span class="hljs-number">2400</span>,<span class="hljs-number">2400</span>,<span class="hljs-number">2400</span>,<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,-<span class="hljs-number">0.15</span>,<span class="hljs-number">0.1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>]
+			[<span class="hljs-string">"noise"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.0360</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.2860</span>,<span class="hljs-number">20</span>,<span class="hljs-number">986</span>,<span class="hljs-number">2400</span>,-<span class="hljs-number">0.6440</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.0100</span>,<span class="hljs-number">0.0003</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]
+			[<span class="hljs-string">"saw"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1140</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.2640</span>,<span class="hljs-number">20</span>,<span class="hljs-number">880</span>,<span class="hljs-number">2400</span>,-<span class="hljs-number">0.6000</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.0100</span>,<span class="hljs-number">0.0003</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.5000</span>,-<span class="hljs-number">0.3620</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]
+			[<span class="hljs-string">"synth"</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.2400</span>,<span class="hljs-number">0.0390</span>,<span class="hljs-number">0.1880</span>,<span class="hljs-number">328</span>,<span class="hljs-number">1269</span>,<span class="hljs-number">2400</span>,-<span class="hljs-number">0.8880</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.0100</span>,<span class="hljs-number">0.0003</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.4730</span>,<span class="hljs-number">0.1660</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1700</span>,<span class="hljs-number">0.1880</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0.1620</span>,<span class="hljs-number">0</span>]
+		]
+	<span class="hljs-property">@initDrumPatterns</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@drumPatterns</span> = [
+			<span class="hljs-string">'0000010000000001'</span>
+			<span class="hljs-string">'0000100000001000'</span>
+			<span class="hljs-string">'0000100100001000'</span>
+			<span class="hljs-string">'0000100001001000'</span>
+			<span class="hljs-string">'0000101111001000'</span>
+			<span class="hljs-string">'0000100100101000'</span>
+			<span class="hljs-string">'0000100000001010'</span>
+			<span class="hljs-string">'0001000001000101'</span>
+			<span class="hljs-string">'0010001000100010'</span>
+			<span class="hljs-string">'0010001000100010'</span>
+			<span class="hljs-string">'0100000010010000'</span>			
+			<span class="hljs-string">'1000100010001000'</span>
+			<span class="hljs-string">'1010010010100101'</span>
+			<span class="hljs-string">'1101000001110111'</span>
+			<span class="hljs-string">'1000100000100010'</span>
+			<span class="hljs-string">'1010101010101010'</span>
+			<span class="hljs-string">'1000100011001000'</span>
+			<span class="hljs-string">'1111000001110110'</span>
+			<span class="hljs-string">'1111101010111010'</span>
+		]
+	<span class="hljs-property">@generateDrumParam</span>: <span class="hljs-function"><span class="hljs-params">(seed)</span> -&gt;</span>
+		<span class="hljs-property">@generateParam</span> seed, <span class="hljs-property">@drumParams</span>
+	<span class="hljs-property">@generateSeParam</span>: <span class="hljs-function"><span class="hljs-params">(type, seed)</span> -&gt;</span>
+		<span class="hljs-property">@generateParam</span> seed, <span class="hljs-property">@seParams</span>[type], <span class="hljs-number">0.75</span>
+	<span class="hljs-property">@generateDrumPattern</span>: <span class="hljs-function"><span class="hljs-params">(seed)</span> -&gt;</span>
+		random = <span class="hljs-keyword">if</span> seed != <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">new</span> Random(seed) <span class="hljs-keyword">else</span> <span class="hljs-property">@random</span>
+		dpsl = <span class="hljs-property">@drumPatterns</span>.length
+		i = random.ri <span class="hljs-number">0</span>, dpsl - <span class="hljs-number">1</span>
+		dp = <span class="hljs-property">@drumPatterns</span>[i]
+		dpl = dp.length
+		dpa = []
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>.dpl - <span class="hljs-number">1</span>]
+			d = dp.charAt i
+			dpa.push <span class="hljs-keyword">if</span> d == <span class="hljs-string">'1'</span> <span class="hljs-keyword">then</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">else</span> <span class="hljs-literal">false</span>
+		<span class="hljs-keyword">while</span> random.r() &lt; <span class="hljs-number">.5</span>
+			ci = random.ri <span class="hljs-number">0</span>, dpsl - <span class="hljs-number">1</span>
+			cdp = <span class="hljs-property">@drumPatterns</span>[ci]
+			<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>.dpl - <span class="hljs-number">1</span>]
+				cd = cdp.charAt i
+				c = <span class="hljs-keyword">if</span> cd == <span class="hljs-string">'1'</span> <span class="hljs-keyword">then</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">else</span> <span class="hljs-literal">false</span>
+				dpa[i] = (!dpa[i]) != (!c)
+		gdp = <span class="hljs-string">''</span>
+		<span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> dpa
+			gdp += <span class="hljs-keyword">if</span> d <span class="hljs-keyword">then</span> <span class="hljs-string">'1'</span> <span class="hljs-keyword">else</span> <span class="hljs-string">'0'</span>
+		gdp
+	<span class="hljs-attribute">reset</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@isPlayingOnce</span> = <span class="hljs-property">@isPlayingLoop</span> = <span class="hljs-literal">null</span>
+	<span class="hljs-attribute">update</span>: <span class="hljs-function"><span class="hljs-params">(ct, tt)</span> -&gt;</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@isPlayingOnce</span>?
+			<span class="hljs-property">@isPlayingOnce</span> = <span class="hljs-literal">null</span>
+			pi = Sound.playInterval * Sound.quantize
+			pt = ceil(ct / pi) * pi
+			<span class="hljs-keyword">if</span> !<span class="hljs-property">@playedTime</span>? || pt &gt; <span class="hljs-property">@playedTime</span>
+				<span class="hljs-property">@playLater</span> pt
+				<span class="hljs-property">@playedTime</span> = pt
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> !<span class="hljs-property">@isPlayingLoop</span>?
+		<span class="hljs-keyword">if</span> !<span class="hljs-property">@scheduledTime</span>?
+			<span class="hljs-property">@scheduledTime</span> =
+				ceil(ct / Sound.playInterval) * Sound.playInterval -
+				Sound.playInterval * <span class="hljs-property">@patternInterval</span>
+			<span class="hljs-property">@patternIndex</span> = <span class="hljs-number">0</span>
+			<span class="hljs-property">@calcNextScheduledTime</span>()
+		<span class="hljs-property">@calcNextScheduledTime</span>() <span class="hljs-keyword">while</span> <span class="hljs-property">@scheduledTime</span> &lt; ct
+		<span class="hljs-keyword">while</span> <span class="hljs-property">@scheduledTime</span> &lt;= tt
+			<span class="hljs-property">@playLater</span> <span class="hljs-property">@scheduledTime</span>
+			<span class="hljs-property">@calcNextScheduledTime</span>()
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-attribute">calcNextScheduledTime</span>: <span class="hljs-function">-&gt;</span>
+		pn = <span class="hljs-property">@pattern</span>.length
+		sti = Sound.playInterval * <span class="hljs-property">@patternInterval</span>
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span><span class="hljs-number">.99</span>]
+			<span class="hljs-property">@scheduledTime</span> += sti
+			p = <span class="hljs-property">@pattern</span>.charAt <span class="hljs-property">@patternIndex</span>
+			<span class="hljs-property">@patternIndex</span> = (<span class="hljs-property">@patternIndex</span> + <span class="hljs-number">1</span>).lr <span class="hljs-number">0</span>, pn
+			<span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> p == <span class="hljs-string">'1'</span>
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-attribute">playLater</span>: <span class="hljs-function"><span class="hljs-params">(delay)</span> -&gt;</span>
+		s = Sound.c.createBufferSource()
+		s.buffer = <span class="hljs-property">@buffer</span>
+		s.connect Sound.gn
+		s.start = s.start || s.noteOn
+		s.start delay</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>random number generator</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Random</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">r</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@range</span> args...
+	<span class="hljs-attribute">range</span>: <span class="hljs-function"><span class="hljs-params">(from = <span class="hljs-number">0</span>, to = <span class="hljs-number">1</span>)</span> -&gt;</span>
+		<span class="hljs-property">@get0to1</span>() * (to - from) + from
+	<span class="hljs-attribute">ri</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@rangeInt</span> args...
+	<span class="hljs-attribute">rangeInt</span>: <span class="hljs-function"><span class="hljs-params">(from = <span class="hljs-number">0</span>, to = <span class="hljs-number">1</span>)</span> -&gt;</span>
+		floor(<span class="hljs-property">@range</span> from, to + <span class="hljs-number">1</span>)
+	<span class="hljs-attribute">pm</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@plusMinus</span> args...
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'plusMinus'</span>, <span class="hljs-function">-&gt;</span>
+		(<span class="hljs-property">@rangeInt</span> <span class="hljs-number">0</span>, <span class="hljs-number">1</span>) * <span class="hljs-number">2</span> - <span class="hljs-number">1</span>
+	<span class="hljs-attribute">sd</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@setSeed</span> args...
+	<span class="hljs-attribute">setSeed</span>: <span class="hljs-function"><span class="hljs-params">(seed = -<span class="hljs-number">0x7fffffff</span>)</span> -&gt;</span>
+		seedValue = <span class="hljs-keyword">if</span> seed == -<span class="hljs-number">0x7fffffff</span>
+			floor Math.random() * <span class="hljs-number">0x7fffffff</span>
+		<span class="hljs-keyword">else</span>
+			seed
+		<span class="hljs-property">@x</span> = seedValue = <span class="hljs-number">1812433253</span> * (seedValue ^ (seedValue &gt;&gt; <span class="hljs-number">30</span>))
+		<span class="hljs-property">@y</span> = seedValue = <span class="hljs-number">1812433253</span> * (seedValue ^ (seedValue &gt;&gt; <span class="hljs-number">30</span>)) + <span class="hljs-number">1</span>
+		<span class="hljs-property">@z</span> = seedValue = <span class="hljs-number">1812433253</span> * (seedValue ^ (seedValue &gt;&gt; <span class="hljs-number">30</span>)) + <span class="hljs-number">2</span>
+		<span class="hljs-property">@w</span> = seedValue = <span class="hljs-number">1812433253</span> * (seedValue ^ (seedValue &gt;&gt; <span class="hljs-number">30</span>)) + <span class="hljs-number">3</span>
+		@</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@setSeed</span>()
+	<span class="hljs-attribute">get0to1</span>: <span class="hljs-function">-&gt;</span> 
+		t = <span class="hljs-property">@x</span> ^ (<span class="hljs-property">@x</span> &lt;&lt; <span class="hljs-number">11</span>)
+		<span class="hljs-property">@x</span> = <span class="hljs-property">@y</span>
+		<span class="hljs-property">@y</span> = <span class="hljs-property">@z</span>
+		<span class="hljs-property">@z</span> = <span class="hljs-property">@w</span>
+		<span class="hljs-property">@w</span> = (<span class="hljs-property">@w</span> ^ (<span class="hljs-property">@w</span> &gt;&gt; <span class="hljs-number">19</span>)) ^ (t ^ (t &gt;&gt; <span class="hljs-number">8</span>))
+		<span class="hljs-property">@w</span> / <span class="hljs-number">0x7fffffff</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>2d vector</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Vector</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">setXy</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@xy</span> args...
+	<span class="hljs-attribute">xy</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@x</span> = <span class="hljs-number">0</span>, <span class="hljs-property">@y</span> = <span class="hljs-number">0</span>)</span> -&gt;</span>
+		@
+	<span class="hljs-attribute">setNumber</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@n</span> args...
+	<span class="hljs-attribute">n</span>: <span class="hljs-function"><span class="hljs-params">(v = <span class="hljs-number">0</span>)</span> -&gt;</span>
+		<span class="hljs-property">@xy</span> v, v
+		@
+	<span class="hljs-attribute">setValue</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@v</span> args...
+	<span class="hljs-attribute">v</span>: <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span>
+		<span class="hljs-property">@x</span> = v.x
+		<span class="hljs-property">@y</span> = v.y
+		@
+	<span class="hljs-attribute">add</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@a</span> args...
+	<span class="hljs-attribute">a</span>: <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span>
+		<span class="hljs-property">@x</span> += v.x
+		<span class="hljs-property">@y</span> += v.y
+		@
+	<span class="hljs-attribute">sub</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@s</span> args...
+	<span class="hljs-attribute">s</span>: <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span>
+		<span class="hljs-property">@x</span> -= v.x
+		<span class="hljs-property">@y</span> -= v.y
+		@
+	<span class="hljs-attribute">mul</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@m</span> args...
+	<span class="hljs-attribute">m</span>: <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span>
+		<span class="hljs-property">@x</span> *= v
+		<span class="hljs-property">@y</span> *= v
+		@
+	<span class="hljs-attribute">div</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@d</span> args...
+	<span class="hljs-attribute">d</span>: <span class="hljs-function"><span class="hljs-params">(v)</span> -&gt;</span>
+		<span class="hljs-property">@x</span> /= v
+		<span class="hljs-property">@y</span> /= v
+		@
+	<span class="hljs-attribute">addWay</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@aw</span> args...
+	<span class="hljs-attribute">aw</span>: <span class="hljs-function"><span class="hljs-params">(way, speed)</span> -&gt;</span>
+		rw = way * PI / <span class="hljs-number">180</span>
+		<span class="hljs-property">@x</span> += (sin rw) * speed
+		<span class="hljs-property">@y</span> -= (cos rw) * speed
+		@
+	<span class="hljs-attribute">rotate</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@rt</span> args...
+	<span class="hljs-attribute">rt</span>: <span class="hljs-function"><span class="hljs-params">(way)</span> -&gt;</span>
+		<span class="hljs-keyword">return</span> @ <span class="hljs-keyword">if</span> way == <span class="hljs-number">0</span>
+		w = way * PI / <span class="hljs-number">180</span>
+		px = <span class="hljs-property">@x</span>
+		<span class="hljs-property">@x</span> = <span class="hljs-property">@x</span> * (cos w) - <span class="hljs-property">@y</span> * (sin w)
+		<span class="hljs-property">@y</span> = px * (sin w) + <span class="hljs-property">@y</span> * (cos w)
+		@
+	<span class="hljs-attribute">distanceTo</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@dt</span> args...
+	<span class="hljs-attribute">dt</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
+		ox = pos.x - <span class="hljs-property">@x</span>
+		oy = pos.y - <span class="hljs-property">@y</span>
+		sqrt ox * ox + oy * oy
+	<span class="hljs-attribute">wayTo</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@wt</span> args...
+	<span class="hljs-attribute">wt</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
+		(atan2 pos.x - <span class="hljs-property">@x</span>, -(pos.y - <span class="hljs-property">@y</span>)) * <span class="hljs-number">180</span> / PI
+	<span class="hljs-attribute">isIn</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@ii</span> args...
+	<span class="hljs-attribute">ii</span>: <span class="hljs-function"><span class="hljs-params">(spacing = <span class="hljs-number">0</span>, minX = <span class="hljs-number">0</span>, maxX = <span class="hljs-number">1</span>, minY = <span class="hljs-number">0</span>, maxY = <span class="hljs-number">1</span>)</span> -&gt;</span>
+		minX - spacing &lt;= <span class="hljs-property">@x</span> &lt;= maxX + spacing &amp;&amp; 
+		minY - spacing &lt;= <span class="hljs-property">@y</span> &lt;= maxY + spacing
+	<span class="hljs-attribute">getWay</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@w</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'w'</span>, <span class="hljs-function">-&gt;</span>
+		(atan2 <span class="hljs-property">@x</span>, -<span class="hljs-property">@y</span>) * <span class="hljs-number">180</span> / PI
+	<span class="hljs-attribute">getLength</span>: <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> <span class="hljs-property">@l</span>
+	<span class="hljs-property">@getter</span> <span class="hljs-string">'l'</span>, <span class="hljs-function">-&gt;</span>
+		sqrt <span class="hljs-property">@x</span> * <span class="hljs-property">@x</span> + <span class="hljs-property">@y</span> * <span class="hljs-property">@y</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>private functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@x</span> = <span class="hljs-number">0</span>, <span class="hljs-property">@y</span> = <span class="hljs-number">0</span>)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>game settings</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Config</span></span>
+	<span class="hljs-property">@fps</span>: <span class="hljs-number">60</span>
+	<span class="hljs-property">@backgroundColor</span>: <span class="hljs-string">'#000'</span>
+	<span class="hljs-property">@soundTempo</span>: <span class="hljs-number">120</span>
+	<span class="hljs-property">@soundVolume</span>: <span class="hljs-number">0.02</span>
+	<span class="hljs-property">@title</span>: [<span class="hljs-string">'MGL.'</span>, <span class="hljs-string">'COFFEE'</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>@isDebuggingMode: true
+@captureArgs: [1, 3, 0.05]</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>aliases for functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>PI = Math.PI
+sin = Math.sin
+cos = Math.cos
+atan2 = Math.atan2
+abs = Math.abs
+sqrt = Math.sqrt
+floor = Math.floor
+ceil = Math.ceil
+max = Math.max
+min = Math.min</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>utility functions for Number</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-attribute">Number</span>::clamp = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> @.c args...
+<span class="hljs-attribute">Number</span>::c = <span class="hljs-function"><span class="hljs-params">(min = <span class="hljs-number">0</span>, max = <span class="hljs-number">1</span>)</span> -&gt;</span>
+	<span class="hljs-keyword">if</span> @ &lt; min <span class="hljs-keyword">then</span> min <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @ &gt; max <span class="hljs-keyword">then</span> max <span class="hljs-keyword">else</span> @
+<span class="hljs-attribute">Number</span>::loopRange = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> @.lr args...
+<span class="hljs-attribute">Number</span>::lr = <span class="hljs-function"><span class="hljs-params">(min = <span class="hljs-number">0</span>, max = <span class="hljs-number">1</span>)</span> -&gt;</span>
+	w = max - min
+	v = @
+	v -= min
+	<span class="hljs-keyword">if</span> v &gt;= <span class="hljs-number">0</span>
+		v % w + min
+	<span class="hljs-keyword">else</span>
+		w + v % w + min
+<span class="hljs-attribute">Number</span>::normalizeWay = <span class="hljs-function">-&gt;</span> @.nw
+Number.getter <span class="hljs-string">'nw'</span>, <span class="hljs-function">-&gt;</span>
+	(@ % <span class="hljs-number">360</span>).lr -<span class="hljs-number">180</span>, <span class="hljs-number">180</span>
+<span class="hljs-attribute">Number</span>::randomRange = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> @.rr args...
+<span class="hljs-attribute">Number</span>::rr = <span class="hljs-function"><span class="hljs-params">(to = <span class="hljs-number">1</span>)</span> -&gt;</span>
+	Game.r.r @, to
+<span class="hljs-attribute">Number</span>::randomRangeInt = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span> @.rri args...
+<span class="hljs-attribute">Number</span>::rri = <span class="hljs-function"><span class="hljs-params">(to = <span class="hljs-number">1</span>)</span> -&gt;</span>
+	Game.r.ri @, to</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>short name aliases for classes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>A = Actor
+C = Color
+G = Game
+M = Mouse</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
