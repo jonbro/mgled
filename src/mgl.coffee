@@ -1,5 +1,6 @@
-window.onload = ->
-	Game.initialize()
+Window.Onload = ->
+	# we don't want to start the game immediately, because the editor kicks it off
+	# Game.initialize()
 
 Function::getter = (prop, get) ->
 	Object.defineProperty @prototype, prop, {get, configurable: yes}
@@ -9,6 +10,13 @@ Function::classGetter = (prop, get) ->
 	Object.defineProperty @, prop, {get, configurable: yes}
 Function::classSetter = (prop, set) ->
 	Object.defineProperty @, prop, {set, configurable: yes}	
+
+# stub so all of k. cho's games work
+class RealtimeLeaderboard
+	@initialize: ->
+	@beginGame: ->
+	@setScore: ->
+	@setTmpScore: ->
 
 # game state and utility functions
 class Game
@@ -24,7 +32,7 @@ class Game
 	@fillRect: (args...) -> Display.fillRect args...
 	@fr: (args...) -> Display.fillRect args...
 	@getDifficulty: (args...) -> @df args...
-	@df: (speed = 1, scale = 1) -> sqrt(@t * speed * 0.0001) * scale + 1
+	@df: (speed = 1, scale = 1) -> sqrt(@ticks * speed * 0.0001) * scale + 1
 	@newDrawing: -> @nd
 	@classGetter 'nd', -> new Drawing
 	@newFiber: -> @nf
@@ -32,16 +40,8 @@ class Game
 		f = new Fiber
 		@fibers.push f
 		f
-	# Create a new particle system
-	#
-	# @return [Particle]
-	#
 	@newParticle: -> @np
 	@classGetter 'np', -> new Particle
-	# Create a new random
-	#
-	# @return [Random]
-	#
 	@newRandom: -> @nr
 	@classGetter 'nr', -> new Random
 	@newSound: -> @ns
@@ -50,18 +50,18 @@ class Game
 	@nt: (text) -> new Text text
 	@newVector: -> @nv
 	@classGetter 'nv', -> new Vector
-	@classGetter 'ticks', -> @t
-	@classGetter 'score', -> @sc
-	@classSetter 'score', (v) -> @sc = v
-	@classGetter 'isBeginning', -> @ib
-	@classGetter 'random', -> @r
+	@classGetter 't', -> @ticks
+	@classGetter 'sc', -> @score
+	@classSetter 'sc', (v) -> @score = v
+	@classGetter 'ib', -> @gameRunning
+	@classGetter 'r', -> @random
 
 	# private functions
 	@initialize: ->
-		@t = 0
-		@sc = 0
-		@ib = false
-		@r = new Random
+		@ticks = 0
+		@score = 0
+		@gameRunning = false
+		@random = new Random
 		@INTERVAL = 1000 / Config.fps
 		@delta = 0
 		@currentTime = @prevTime = 0
@@ -92,7 +92,7 @@ class Game
 		@isPaused = false
 		@postUpdate()
 	@beginTitle: ->
-		@ib = false
+		@gameRunning = false
 		ty = if Config.title.length == 1 then .4 else .35
 		new Text(Config.title[0]).xy(.5, ty).sc(3).df
 		if Config.title.length > 1
@@ -100,15 +100,15 @@ class Game
 		new Text('[ CLICK / TOUCH ] TO START').xy(.5, .6).df
 		Mouse.setPressedDisabledCount 10
 	@beginGame: ->
-		@ib = true
-		@sc = 0
+		@gameRunning = true
+		@score = 0
 		window.beginGame?()
 		@initializeGame()
 	@initializeGame: ->
 		Actor.clear()
 		Sound.reset()
 		@fibers = []
-		@t = 0
+		@ticks = 0
 		window.begin?()
 	@preUpdate: (time) ->
 		if time?
@@ -137,10 +137,10 @@ class Game
 				@fibers.splice i, 1
 			else
 				i++
-		Display.drawText "#{@sc}", 1, 0, 1
+		Display.drawText "#{@score}", 1, 0, 1
 		@postUpdate()
-		@t++
-		@updateTitle() if !@ib
+		@ticks++
+		@updateTitle() if !@gameRunning
 		if Config.isDebuggingMode
 			@calcFps()
 			Display.drawText "FPS:#{@fps}", 0, 0.97
@@ -158,7 +158,8 @@ class Game
 			@fps = floor @fpsCount * 1000 / delta
 			@lastFrameTime = currentTime
 			@fpsCount = 0
-requestAnimFrame =
+
+requestAnimFrameSystem =
 	window.requestAnimationFrame	   ||
 	window.webkitRequestAnimationFrame ||
 	window.mozRequestAnimationFrame	   ||
@@ -166,6 +167,14 @@ requestAnimFrame =
 	window.msRequestAnimationFrame	   ||
 	(callback) ->
 		window.setTimeout callback, Game.INTERVAL / 2
+
+requestAnimFrame = (callback) ->
+	requestAnimFrameSystem ->
+		try
+			callback()
+		catch e
+			 ErrorReporter.handleError e
+
 class Display
 	@initialize: ->
 		@e = $('#display')[0]
@@ -283,6 +292,7 @@ class Actor
 				.replace /^\s*function\s*([^\(]*)[\S\s]+$/im, '$1'
 			for g in @groups
 				g.clear() if g.name == className
+	removeGroups: -> @groups = []
 	remove: -> @r
 	@getter 'r', -> @isRemoving = true
 	setDisplayPriority: (args...) -> @dp args...
@@ -330,8 +340,8 @@ class Actor
 	@setter 'way', (v) -> @w = v
 	@getter 'speed', -> @s
 	@setter 'speed', (v) -> @s = v
-	@getter 'ticks', -> @t
-	@setter 'ticks', (v) -> @t = v
+	@getter 'ticks', -> @ticks
+	@setter 'ticks', (v) -> @ticks = v
 	@getter 'drawing', -> @d
 	@setter 'drawing', (v) -> @d = v
 	@getter 'ir', -> @isRemoving
@@ -365,7 +375,7 @@ class Actor
 		@v = new Vector
 		@w = 0
 		@s = 0
-		@t = 0
+		@ticks = 0
 		@d = new Drawing
 		@fibers = []
 		@isRemoving = false
@@ -387,7 +397,7 @@ class Actor
 		@p.aw @w, @s
 		f.update() for f in @fibers
 		@d.p(@p).w(@w).d
-		@t++
+		@ticks++
 class ActorGroup
 	constructor: (@name) ->
 		@clear()
@@ -626,7 +636,7 @@ class Color
 	@cyan: new Color 0, 1, 1
 	@w: new Color 1, 1, 1
 	@white: new Color 1, 1, 1
-	@t: new Color -1, -1, -1
+	@ticks: new Color -1, -1, -1
 	@transparent: new Color -1, -1, -1
 
 	# private functions
@@ -702,9 +712,9 @@ class TextActor extends Actor
 		@color = Color.white
 		@scale = 1
 	update: ->
-		@v.d @duration if @t == 0
+		@v.d @duration if @ticks == 0
 		Display.drawText @text, @p.x, @p.y, @xAlign, 0, @color, @scale
-		@r if @t >= @duration - 1
+		@r if @ticks >= @duration - 1
 class Letter
 	@initialize: ->
 		@COUNT = 66
@@ -823,7 +833,7 @@ class ParticleActor extends Actor
 				p.duration = pp.duration * (0.5.rr 1.5)
 			return
 		Display.fillRect @p.x, @p.y, @size, @size, @color
-		@r if @t >= @duration - 1
+		@r if @ticks >= @duration - 1
 
 # mouse/touch position and event
 class Mouse
@@ -1089,28 +1099,28 @@ class Sound
 # random number generator
 class Random
 	# public functions
-	range: (args...) -> @r args...
-	r: (from = 0, to = 1) ->
+	r: (args...) -> @range args...
+	range: (from = 0, to = 1) ->
 		@get0to1() * (to - from) + from
-	rangeInt: (args...) -> @ri args...
-	ri: (from = 0, to = 1) ->
-		floor(@r from, to + 1)
-	plusMinus: (args...) -> @pm args...
-	@getter 'pm', ->
-		(@ri 0, 1) * 2 - 1
-	setSeed: (args...) -> @sd args...
-	sd: (v = -0x7fffffff) ->
-		sv = if v == -0x7fffffff
+	ri: (args...) -> @rangeInt args...
+	rangeInt: (from = 0, to = 1) ->
+		floor(@range from, to + 1)
+	pm: (args...) -> @plusMinus args...
+	@getter 'plusMinus', ->
+		(@rangeInt 0, 1) * 2 - 1
+	sd: (args...) -> @setSeed args...
+	setSeed: (seed = -0x7fffffff) ->
+		seedValue = if seed == -0x7fffffff
 			floor Math.random() * 0x7fffffff
 		else
-			v
-		@x = sv = 1812433253 * (sv ^ (sv >> 30))
-		@y = sv = 1812433253 * (sv ^ (sv >> 30)) + 1
-		@z = sv = 1812433253 * (sv ^ (sv >> 30)) + 2
-		@w = sv = 1812433253 * (sv ^ (sv >> 30)) + 3
+			seed
+		@x = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30))
+		@y = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 1
+		@z = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 2
+		@w = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 3
 		@
 	# private functions
-	constructor: -> @sd()
+	constructor: -> @setSeed()
 	get0to1: -> 
 		t = @x ^ (@x << 11)
 		@x = @y
