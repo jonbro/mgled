@@ -133,8 +133,8 @@ class Game
 		while true
 			break if i >= @fibers.length
 			f = @fibers[i]
-			f.update() if !f.isRemoving
-			if f.isRemoving
+			f.update() if !f.removing
+			if f.removing
 				@fibers.splice i, 1
 			else
 				i++
@@ -421,10 +421,8 @@ class ActorGroup
 # drawn character consists of rects
 class Drawing
 	# public functions
-	setColor: (args...) -> @c args...
-	c: (@color) -> @
-	addRect: (args...) -> @r args...
-	r: (width, height = 0, ox = 0, oy = 0) ->
+	setColor: (@color) -> @
+	addRect: (width, height = 0, ox = 0, oy = 0) ->
 		@lastAdded =
 			type: 'rect'
 			width: width
@@ -432,11 +430,10 @@ class Drawing
 			offsetX: ox
 			offsetY: oy
 		height = width if height == 0
-		@s.push new DrawingRect @color, width, height,
+		@shapes.push new DrawingRect @color, width, height,
 			ox, oy, @hasCollision
 		@
-	addRects: (args...) -> @rs args...
-	rs: (width, height, ox = 0, oy = 0, way = 0) ->
+	addRects: (width, height, ox = 0, oy = 0, way = 0) ->
 		@lastAdded =
 			type: 'rects'
 			width: width
@@ -456,76 +453,65 @@ class Drawing
 		vo = width
 		width *= 1.05
 		for i in [1..n]
-			@s.push new DrawingRect @color, width, width,
+			@shapes.push new DrawingRect @color, width, width,
 				sin(w) * o + ox, cos(w) * o + oy, @hasCollision
 			o += vo
 		@
-	addRotate: (args...) -> @rt args...
-	rt: (angle, number = 1) ->
+	addRotate: (angle, number = 1) ->
 		o = new Vector().xy @lastAdded.offsetX, @lastAdded.offsetY
 		w = @lastAdded.way
 		for i in [1..number]
 			o.rt angle
 			switch @lastAdded.type
 				when 'rect'
-					@r @lastAdded.width, @lastAdded.height, o.x, o.y
+					@addRect @lastAdded.width, @lastAdded.height, o.x, o.y
 				when 'rects'
 					w -= angle
-					@rs @lastAdded.width, @lastAdded.height, o.x, o.y, w
+					@addRects @lastAdded.width, @lastAdded.height, o.x, o.y, w
 		@
-	addMirrorX: -> @mx
-	@getter 'mx', ->
+	@getter 'addMirrorX', ->
 		switch @lastAdded.type
 			when 'rect'
-				@r @lastAdded.width, @lastAdded.height,
+				@addRect @lastAdded.width, @lastAdded.height,
 					-@lastAdded.offsetX, @lastAdded.offsetY
 			when 'rects'
-				@rs @lastAdded.width, @lastAdded.height,
+				@addRects @lastAdded.width, @lastAdded.height,
 					-@lastAdded.offsetX, @lastAdded.offsetY,
 					-@lastAdded.way
 		@
-	addMirrorX: -> @my
-	@getter 'my', ->
+	@getter 'addMirrorY', ->
 		switch @lastAdded.type
 			when 'rect'
-				@r @lastAdded.width, @lastAdded.height,
+				@addRect @lastAdded.width, @lastAdded.height,
 					@lastAdded.offsetX, -@lastAdded.offsetY
 			when 'rects'
-				@rs @lastAdded.width, @lastAdded.height,
+				@addRects @lastAdded.width, @lastAdded.height,
 					@lastAdded.offsetX, -@lastAdded.offsetY,
 					-@lastAdded.way
 		@
-	setPos: (args...) -> @p args...
-	p: (p) ->
+	setPos: (p) ->
 		@pos.v p
 		@
-	setXy: (args...) -> @xy args...
-	xy: (x, y) ->
+	setXy: (x, y) ->
 		@pos.xy x, y
 		@
-	setWay: (args...) -> @w args...
-	w: (w) ->
+	setWay: (w) ->
 		@way = w
 		@
-	setScale: (args...) -> @sc args...
-	sc: (x, y = -9999999) ->
+	setScale: (x, y = -9999999) ->
 		y = x if y == -9999999 
 		@scale.xy x, y
 		@
-	draw: -> @d
-	@getter 'd', ->
-		r.draw @ for r in @s
+	@getter 'draw', ->
+		r.draw @ for r in @shapes
 		@
-	enableCollision: -> @ec
-	@getter 'ec', ->
+	@getter 'enableCollision', ->
 		@hasCollision = true
 		@
-	disableCollision: -> @dc
-	@getter 'dc', ->
+	@getter 'disableCollision', ->
 		@hasCollision = false
 		@
-	onCollision: (args...) -> @oc args...
-	oc: (targetClass, handler = null) ->
+	onCollision: (targetClass, handler = null) ->
 		@updateState()
 		isCollided = false
 		collideCheckedActors = Actor.s targetClass
@@ -534,25 +520,42 @@ class Drawing
 				isCollided = true
 				handler? cca
 		isCollided
-	clear: -> @cl
-	@getter 'cl', ->
-		@s = []
+	@getter 'clear', ->
+		@shapes = []
 		@
+	
+	# shorthand functions
+	# grouped so that we can delete them easier later
+	c: (args...) -> @setColor args...
+	r: (args...) -> @addRect args...
+	rs: (args...) -> @addRects args...
+	rt: (args...) -> @addRotate args...
+	mx: -> @addMirrorX
+	my: -> @addMirrorY
+	p: (args...) -> @setPos args...
+	xy: (args...) -> @setXy args...
+	w: (args...) -> @setWay args...
+	sc: (args...) -> @setScale args...
+	d: -> @draw
+	ec: -> @enableCollision
+	dc: -> @disableCollision
+	oc: (args...) -> @onCollision args...
+	cl: -> @clear
 
 	# private functions
 	constructor: ->
-		@s = []
+		@shapes = []
 		@pos = new Vector
 		@way = 0
 		@scale = new Vector 1, 1
 		@hasCollision = true
 		@color = Color.white
 	updateState: -> 
-		r.updateState @ for r in @s
+		r.updateState @ for r in @shapes
 		@
 	isCollided: (d) ->
 		isCollided = false
-		for r in @s
+		for r in @shapes
 			for dr in d.s
 				isCollided = true if r.isCollided dr
 		isCollided
@@ -583,37 +586,40 @@ class DrawingRect
 # lightweight thread
 class Fiber
 	# public functions
-	doRepeat: (args...) -> @dr args...
-	dr: (func) ->
+	doRepeat: (func) ->
 		@funcs.push func
 		@
-	doOnce: (args...) -> @d args...
-	d: (func) ->
+	doOnce: (func) ->
 		@funcs.push =>
 			func.call @
 			@n
 		@
-	wait: (args...) -> @w args...
-	w: (ticks) ->
+	wait: (ticks) ->
 		@funcs.push =>
 			@ticks = ticks
 			@n
 		@funcs.push =>
 			@n if --@ticks < 0
 		@
-	next: -> @n
-	@getter 'n', ->
+	@getter 'next', ->
 		@funcIndex = 0 if ++@funcIndex >= @funcs.length
 		@
-	remove: -> @r
-	@getter 'r', -> @isRemoving = true
-	@getter 'ir', -> @isRemoving
+	@getter 'remove', -> @removing = true
+
+	#shorthand/compatibility functions
+	dr: (args...) -> @doRepeat args...
+	d: (args...) -> @doOnce args...
+	w: (args...) -> @wait args...
+	n: -> @next
+	r: -> @remove
+	@getter 'isRemoving' -> @removing
+	@getter 'ir', -> @removing
 
 	# private functions
 	constructor: ->
 		@funcs = []
 		@funcIndex = 0
-		@isRemoving = false
+		@removing = false
 	update: ->
 		@funcs[@funcIndex].call @			
 
