@@ -796,14 +796,14 @@ Actor = (function() {
     return this.isRemoving;
   });
 
-  Actor.prototype.i = function() {};
+  Actor.prototype.initialize = function() {};
 
-  Actor.prototype.b = function() {
+  Actor.prototype.begin = function() {
     var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
   };
 
-  Actor.prototype.u = function() {};
+  Actor.prototype.update = function() {};
 
   Actor.update = function() {
     var g, _i, _j, _len, _len1, _ref, _ref1;
@@ -833,14 +833,14 @@ Actor = (function() {
   function Actor() {
     var args, className, g, _i, _len, _ref;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    if (this.initialize != null) {
-      this.i = this.initialize;
+    if (this.i != null) {
+      this.initialize = this.i;
     }
-    if (this.begin != null) {
-      this.b = this.begin;
+    if (this.b != null) {
+      this.begin = this.b;
     }
-    if (this.update != null) {
-      this.u = this.update;
+    if (this.u != null) {
+      this.update = this.u;
     }
     this.p = new Vector;
     this.v = new Vector;
@@ -863,10 +863,10 @@ Actor = (function() {
       this.group = new ActorGroup(className);
       Actor.groups.push(this.group);
       Actor.sortGroups();
-      this.i();
+      this.initialize();
     }
     this.group.s.push(this);
-    this.b.apply(this, args);
+    this.begin.apply(this, args);
   }
 
   Actor.prototype.postUpdate = function() {
@@ -906,7 +906,7 @@ ActorGroup = (function() {
       }
       a = this.s[i];
       if (!a.isRemoving) {
-        a.u();
+        a.update();
       }
       if (a.isRemoving) {
         this.s.splice(i, 1);

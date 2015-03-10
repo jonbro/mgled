@@ -350,12 +350,12 @@ class Actor
 	@getter 'ir', -> @isRemoving
 
 	# functions should be overrided
-	# initialize (called once in the game)
-	i: ->
+	# initialize (called once per class)
+	initialize: ->
 	# begin (called after the Actor is instanced)
-	b: (args...) ->
+	begin: (args...) ->
 	# update (called on every frame)
-	u: ->
+	update: ->
 
 	# private functions
 	@update: ->
@@ -371,9 +371,9 @@ class Actor
 		@groups.sort (v1, v2) ->
 			v1.displayPriority - v2.displayPriority
 	constructor: (args...) ->
-		@i = @initialize if @initialize?
-		@b = @begin if @begin?
-		@u = @update if @update?
+		@initialize = @i if @i?
+		@begin = @b if @b?
+		@update = @u if @u?
 		@p = new Vector
 		@v = new Vector
 		@w = 0
@@ -384,17 +384,17 @@ class Actor
 		@isRemoving = false
 		className = ('' + @constructor)
 			.replace /^\s*function\s*([^\(]*)[\S\s]+$/im, '$1'
-		for g in Actor.groups
-			if g.name == className
-				@group = g
+		for group in Actor.groups
+			if group.name == className
+				@group = group
 				break
 		if !@group?
 			@group = new ActorGroup className
 			Actor.groups.push @group
 			Actor.sortGroups()
-			@i()
+			@initialize()
 		@group.s.push @
-		@b args...
+		@begin args...
 	postUpdate: ->
 		@pos.add @vel
 		@pos.addWay @way, @speed
@@ -412,7 +412,7 @@ class ActorGroup
 		while true
 			break if i >= @s.length
 			a = @s[i]
-			a.u() if !a.isRemoving
+			a.update() if !a.isRemoving
 			if a.isRemoving
 				@s.splice i, 1
 			else
