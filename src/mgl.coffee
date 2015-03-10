@@ -322,7 +322,7 @@ class Actor
 		p.p @p
 		p
 	@getter 'newRandom', -> new Random
-	@getter 'newSound', -> new Sound
+	newSound: -> new Sound
 	newText: (text) ->
 		t = new Text text
 		t.p @pos
@@ -393,7 +393,7 @@ class ActorShorthand extends Actor
 	@getter 'nf', -> @newFiber
 	@getter 'np', -> @newParticle
 	@getter 'nr', -> @newRandom
-	@getter 'ns', -> @newSound
+	@getter 'ns', -> @newSound()
 	nt: (args...) -> @newText args...
 	@getter 'p', -> @pos
 	@setter 'p', (v) -> @pos = v

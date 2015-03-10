@@ -10,12 +10,8 @@ if the error you are getting is in mgl.coffee, the editor will report that it ca
 
 need to swap to the longer function names for the following classes
 
-- Actor
-- Text
-- TextActor
-- Particle
-- ParticleActor
 - Mouse
 - Key
-- Sound
-- Vector
+- Sound (having issues with the statics)
+
+Need to clear the class lists when the editor runs again, right now it is not properly rerunning the init scripts

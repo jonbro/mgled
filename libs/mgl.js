@@ -671,9 +671,9 @@ Actor = (function() {
     return new Random;
   });
 
-  Actor.getter('newSound', function() {
+  Actor.prototype.newSound = function() {
     return new Sound;
-  });
+  };
 
   Actor.prototype.newText = function(text) {
     var t;
@@ -829,7 +829,7 @@ ActorShorthand = (function(_super) {
   });
 
   ActorShorthand.getter('ns', function() {
-    return this.newSound;
+    return this.newSound();
   });
 
   ActorShorthand.prototype.nt = function() {
