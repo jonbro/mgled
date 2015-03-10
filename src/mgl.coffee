@@ -173,7 +173,10 @@ requestAnimFrame = (callback) ->
 		try
 			callback()
 		catch e
-			 ErrorReporter.handleError e
+			if ErrorReporter?
+				ErrorReporter.handleError e
+			else
+				console.log(e)
 
 class Display
 	@initialize: ->
@@ -393,10 +396,10 @@ class Actor
 		@group.s.push @
 		@b args...
 	postUpdate: ->
-		@p.a @v
-		@p.aw @w, @s
-		f.update() for f in @fibers
-		@d.p(@p).w(@w).d
+		@pos.add @vel
+		@pos.addWay @way, @speed
+		fiber.update() for fiber in @fibers
+		@drawing.setPos(@pos).setWay(@way).draw
 		@ticks++
 class ActorGroup
 	constructor: (@name) ->
@@ -433,6 +436,8 @@ class ActorGroup
 # 	.addRect 0.012, 0.012, 0,0
 # ```
 #
+
+
 class Drawing
 	# sets the current drawing color
 	# all rects added after this will use the current color
@@ -450,7 +455,7 @@ class Drawing
 		@shapes.push new DrawingRect @color, width, height,
 			ox, oy, @hasCollision
 		@
-		
+
 	# adds a set of rects that simulates a rotated square
 	addRects: (width, height, ox = 0, oy = 0, way = 0) ->
 		@lastAdded =
@@ -549,18 +554,21 @@ class Drawing
 	r: (args...) -> @addRect args...
 	rs: (args...) -> @addRects args...
 	rt: (args...) -> @addRotate args...
-	mx: -> @addMirrorX
-	my: -> @addMirrorY
 	p: (args...) -> @setPos args...
 	xy: (args...) -> @setXy args...
 	w: (args...) -> @setWay args...
 	sc: (args...) -> @setScale args...
-	d: -> @draw
-	ec: -> @enableCollision
-	dc: -> @disableCollision
 	oc: (args...) -> @onCollision args...
-	cl: -> @clear
 
+	# i think this may be a bug in the original mgl,
+	# if you have a shorthand pointing to a getter, it must also be a getter
+	@getter 'd', -> @draw
+	@getter 'ec', -> @enableCollision
+	@getter 'dc', -> @disableCollision
+	@getter 'mx', -> @addMirrorX
+	@getter 'my', -> @addMirrorY
+	@getter 'cl', -> @clear
+	
 	# private functions
 	constructor: ->
 		@shapes = []
@@ -574,10 +582,13 @@ class Drawing
 		@
 	isCollided: (d) ->
 		isCollided = false
+		#check each of our drawing rects
 		for r in @shapes
-			for dr in d.s
+			#against each of the other drawings rects
+			for dr in d.shapes
 				isCollided = true if r.isCollided dr
 		isCollided
+
 class DrawingRect
 	constructor: (@color, width, height, ox, oy, @hasCollision) ->
 		@size = new Vector width, height
@@ -629,8 +640,8 @@ class Fiber
 	dr: (args...) -> @doRepeat args...
 	d: (args...) -> @doOnce args...
 	w: (args...) -> @wait args...
-	n: -> @next
-	r: -> @remove
+	@getter 'n', -> @next
+	@getter 'r', -> @remove
 	@getter 'isRemoving', -> @removing
 	@getter 'ir', -> @removing
 

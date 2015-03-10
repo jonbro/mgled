@@ -4,8 +4,6 @@ var A, Actor, ActorGroup, C, Color, Config, Display, Drawing, DrawingRect, Fiber
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-Window.Onload = function() {};
-
 Function.prototype.getter = function(prop, get) {
   return Object.defineProperty(this.prototype, prop, {
     get: get,
@@ -369,7 +367,11 @@ requestAnimFrame = function(callback) {
       return callback();
     } catch (_error) {
       e = _error;
-      return ErrorReporter.handleError(e);
+      if (typeof ErrorReporter !== "undefined" && ErrorReporter !== null) {
+        return ErrorReporter.handleError(e);
+      } else {
+        return console.log(e);
+      }
     }
   });
 };
@@ -868,15 +870,15 @@ Actor = (function() {
   }
 
   Actor.prototype.postUpdate = function() {
-    var f, _i, _len, _ref;
-    this.p.a(this.v);
-    this.p.aw(this.w, this.s);
+    var fiber, _i, _len, _ref;
+    this.pos.add(this.vel);
+    this.pos.addWay(this.way, this.speed);
     _ref = this.fibers;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      f = _ref[_i];
-      f.update();
+      fiber = _ref[_i];
+      fiber.update();
     }
-    this.d.p(this.p).w(this.w).d;
+    this.drawing.setPos(this.pos).setWay(this.way).draw;
     return this.ticks++;
   };
 
@@ -1127,14 +1129,6 @@ Drawing = (function() {
     return this.addRotate.apply(this, args);
   };
 
-  Drawing.prototype.mx = function() {
-    return this.addMirrorX;
-  };
-
-  Drawing.prototype.my = function() {
-    return this.addMirrorY;
-  };
-
   Drawing.prototype.p = function() {
     var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -1159,27 +1153,35 @@ Drawing = (function() {
     return this.setScale.apply(this, args);
   };
 
-  Drawing.prototype.d = function() {
-    return this.draw;
-  };
-
-  Drawing.prototype.ec = function() {
-    return this.enableCollision;
-  };
-
-  Drawing.prototype.dc = function() {
-    return this.disableCollision;
-  };
-
   Drawing.prototype.oc = function() {
     var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     return this.onCollision.apply(this, args);
   };
 
-  Drawing.prototype.cl = function() {
+  Drawing.getter('d', function() {
+    return this.draw;
+  });
+
+  Drawing.getter('ec', function() {
+    return this.enableCollision;
+  });
+
+  Drawing.getter('dc', function() {
+    return this.disableCollision;
+  });
+
+  Drawing.getter('mx', function() {
+    return this.addMirrorX;
+  });
+
+  Drawing.getter('my', function() {
+    return this.addMirrorY;
+  });
+
+  Drawing.getter('cl', function() {
     return this.clear;
-  };
+  });
 
   function Drawing() {
     this.shapes = [];
@@ -1206,7 +1208,7 @@ Drawing = (function() {
     _ref = this.shapes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       r = _ref[_i];
-      _ref1 = d.s;
+      _ref1 = d.shapes;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         dr = _ref1[_j];
         if (r.isCollided(dr)) {
@@ -1318,13 +1320,13 @@ Fiber = (function() {
     return this.wait.apply(this, args);
   };
 
-  Fiber.prototype.n = function() {
+  Fiber.getter('n', function() {
     return this.next;
-  };
+  });
 
-  Fiber.prototype.r = function() {
+  Fiber.getter('r', function() {
     return this.remove;
-  };
+  });
 
   Fiber.getter('isRemoving', function() {
     return this.removing;
