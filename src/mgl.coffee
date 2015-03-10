@@ -260,11 +260,10 @@ class Actor
 	@s: (targetClass) ->
 		className = ('' + targetClass)
 			.replace /^\s*function\s*([^\(]*)[\S\s]+$/im, '$1'
-		for g in @groups
+		for g in Actor.groups
 			if g.name == className
 				return g.s
 		[]
-	@sc: (args...) -> @scroll args...
 	@scroll: (targetClasses, ox, oy = 0,
 		  minX = 0, maxX = 0, minY = 0, maxY = 0) ->
 		tcs =
@@ -279,11 +278,11 @@ class Actor
 				a.p.y += oy
 				a.p.x = a.p.x.lr minX, maxX if minX < maxX
 				a.p.y = a.p.y.lr minY, maxY if minY < maxY
-	@clear: (args...) -> @cl args...
-	@cl: (targetClasses = null) ->
-		@groups = [] if !@groups?
+	@clear: (targetClasses = null) ->
+		Actor.groups = [] if !Actor.groups?
+		console.log "setting up groups" + Actor.groups
 		if targetClasses == null
-			g.clear() for g in @groups
+			g.clear() for g in Actor.groups
 			return
 		tcs =
 			if (targetClasses instanceof Array)
@@ -293,17 +292,19 @@ class Actor
 		for tc in tcs
 			className = ('' + tc)
 				.replace /^\s*function\s*([^\(]*)[\S\s]+$/im, '$1'
-			for g in @groups
+			for g in Actor.groups
 				g.clear() if g.name == className
-	removeGroups: -> @groups = []
-	remove: -> @r
-	@getter 'r', -> @isRemoving = true
-	setDisplayPriority: (args...) -> @dp args...
-	dp: (displayPriority) ->
+	removeGroups: -> Actor.groups = []
+
+	# hmm, just noticed an issue with this:
+	# basically in the original, the shorthand versions used the getter call style
+	# and the longhand versions used function call style :/ not a fan
+	
+	remove: -> @isRemoving = true
+	setDisplayPriority: (displayPriority) ->
 		@group.displayPriority = displayPriority
 		Actor.sortGroups()
-	onCollision: (args...) -> @oc args...
-	oc: (targetClass, handler = null) ->
+	onCollision: (targetClass, handler = null) ->
 		isCollided = false
 		collideCheckedActors = Actor.s targetClass
 		for cca in collideCheckedActors
@@ -311,43 +312,23 @@ class Actor
 				isCollided = true
 				handler? cca
 		isCollided
-	newDrawing: -> @nd
-	@getter 'nd', -> new Drawing
-	newFiber: -> @nf
-	@getter 'nf', ->
+	@getter 'newDrawing', -> new Drawing
+	@getter 'newFiber', ->
 		f = new Fiber
 		f.a = @
 		@fibers.push f
 		f
-	newParticle: -> @np
-	@getter 'np', ->
+	@getter 'newParticle', ->
 		p = new Particle
 		p.p @p
 		p
-	newRandom: -> @nr
-	@getter 'nr', -> new Random
-	newSound: -> @ns
-	@getter 'ns', -> new Sound
-	newText: (args...) -> @nt args...
-	nt: (text) ->
+	@getter 'newRandom', -> new Random
+	@getter 'newSound', -> new Sound
+	newText: (text) ->
 		t = new Text text
-		t.p @p
+		t.pos @pos
 		t
-	newVector: -> @nv
-	@getter 'nv', -> new Vector
-	@getter 'pos', -> @p
-	@setter 'pos', (v) -> @p = v
-	@getter 'vel', -> @v
-	@setter 'vel', (v) -> @v = v
-	@getter 'way', -> @w
-	@setter 'way', (v) -> @w = v
-	@getter 'speed', -> @s
-	@setter 'speed', (v) -> @s = v
-	@getter 't', -> @ticks
-	@setter 't', (v) -> @ticks = v
-	@getter 'drawing', -> @d
-	@setter 'drawing', (v) -> @d = v
-	@getter 'ir', -> @isRemoving
+	@getter 'newVector', -> new Vector
 
 	# functions should be overrided
 	# initialize (called once per class)
@@ -361,25 +342,22 @@ class Actor
 	@update: ->
 		if Config.isDebuggingMode
 			Actor.number = 0
-			for g in @groups
+			for g in Actor.groups
 				g.update()
 				Actor.number += g.s.length
 		else
-			g.update() for g in @groups
+			g.update() for g in Actor.groups
 		return
 	@sortGroups: ->
-		@groups.sort (v1, v2) ->
+		Actor.groups.sort (v1, v2) ->
 			v1.displayPriority - v2.displayPriority
 	constructor: (args...) ->
-		@initialize = @i if @i?
-		@begin = @b if @b?
-		@update = @u if @u?
-		@p = new Vector
-		@v = new Vector
-		@w = 0
-		@s = 0
+		@pos = new Vector
+		@vel = new Vector
+		@way = 0
+		@speed = 0
 		@ticks = 0
-		@d = new Drawing
+		@drawing = new Drawing
 		@fibers = []
 		@isRemoving = false
 		className = ('' + @constructor)
@@ -401,6 +379,41 @@ class Actor
 		fiber.update() for fiber in @fibers
 		@drawing.setPos(@pos).setWay(@way).draw
 		@ticks++
+
+class ActorShorthand extends Actor	
+	#shorthand functions
+	@sc: (args...) -> @scroll args...
+	@getter 't', -> @ticks
+	@setter 't', (v) -> @ticks = v
+	@getter 'ir', -> @isRemoving
+	@cl: (args...) -> @clear args...
+	@getter 'r', -> @remove()
+	dp: (args...) -> @setDisplayPriority args...
+	oc: (args...) -> @onCollision args...
+	@getter 'nd': -> @newDrawing
+	@getter 'nf', -> @newFiber
+	@getter 'np', -> @newParticle
+	@getter 'nr', -> @newRandom
+	@getter 'ns', -> @newSound
+	nt: (args...) -> @newText args...
+	@getter 'p', -> @pos
+	@setter 'p', (v) -> @pos = v
+	@getter 'v', -> @vel
+	@setter 'v', (v) -> @vel = v
+	@getter 's', -> @speed
+	@setter 's', (v) -> @speed = v
+	@getter 'w', -> @way
+	@setter 'w', (v) -> @way = v
+	@getter 'd', -> @drawing
+	@setter 'd', (v) -> @drawing = v
+	@getter 'nv': -> @newVector
+
+	constructor: (args...) ->
+		@initialize = @i if @i?
+		@begin = @b if @b?
+		@update = @u if @u?
+		super args...
+
 class ActorGroup
 	constructor: (@name) ->
 		@clear()
@@ -547,7 +560,28 @@ class Drawing
 	@getter 'clear', ->
 		@shapes = []
 		@
-	
+		
+	# private functions
+	constructor: ->
+		@shapes = []
+		@pos = new Vector
+		@way = 0
+		@scale = new Vector 1, 1
+		@hasCollision = true
+		@color = Color.white
+	updateState: -> 
+		r.updateState @ for r in @shapes
+		@
+	isCollided: (d) ->
+		isCollided = false
+		#check each of our drawing rects
+		for r in @shapes
+			#against each of the other drawings rects
+			for dr in d.shapes
+				isCollided = true if r.isCollided dr
+		isCollided
+
+class DrawingShorthand extends Drawing
 	# shorthand functions
 	# grouped so that we can delete them easier later
 	c: (args...) -> @setColor args...
@@ -568,26 +602,6 @@ class Drawing
 	@getter 'mx', -> @addMirrorX
 	@getter 'my', -> @addMirrorY
 	@getter 'cl', -> @clear
-	
-	# private functions
-	constructor: ->
-		@shapes = []
-		@pos = new Vector
-		@way = 0
-		@scale = new Vector 1, 1
-		@hasCollision = true
-		@color = Color.white
-	updateState: -> 
-		r.updateState @ for r in @shapes
-		@
-	isCollided: (d) ->
-		isCollided = false
-		#check each of our drawing rects
-		for r in @shapes
-			#against each of the other drawings rects
-			for dr in d.shapes
-				isCollided = true if r.isCollided dr
-		isCollided
 
 class DrawingRect
 	constructor: (@color, width, height, ox, oy, @hasCollision) ->
@@ -636,6 +650,15 @@ class Fiber
 		@
 	@getter 'remove', -> @removing = true
 
+	# private functions
+	constructor: ->
+		@funcs = []
+		@funcIndex = 0
+		@removing = false
+	update: ->
+		@funcs[@funcIndex].call @
+
+class FiberShorthand extends Fiber
 	#shorthand/compatibility functions
 	dr: (args...) -> @doRepeat args...
 	d: (args...) -> @doOnce args...
@@ -644,14 +667,6 @@ class Fiber
 	@getter 'r', -> @remove
 	@getter 'isRemoving', -> @removing
 	@getter 'ir', -> @removing
-
-	# private functions
-	constructor: ->
-		@funcs = []
-		@funcIndex = 0
-		@removing = false
-	update: ->
-		@funcs[@funcIndex].call @			
 
 # rgb color
 class Color
@@ -690,15 +705,15 @@ class Text
 	# public functions
 	setPos: (args...) -> @p args...
 	p: (pos) ->
-		@a.p.v pos
+		@a.pos.v pos
 		@
 	setXy: (args...) -> @xy args...
 	xy: (x, y) ->
-		@a.p.xy x, y
+		@a.pos.xy x, y
 		@
 	setVelocity: (args...) -> @v args...
 	v: (x, y) ->
-		@a.v.xy x, y
+		@a.vel.xy x, y
 		@
 	setDuration: (args...) -> @d args...
 	d: (duration) ->
@@ -728,12 +743,12 @@ class Text
 	@getter 'so', ->
 		if (Text.shownTexts.indexOf @a.text) >= 0
 			@a.text = ''
-			@a.r
+			@a.remove()
 		else
 			Text.shownTexts.push @a.text
 		@
 	remove: -> @r
-	@getter 'r', -> @a.r
+	@getter 'r', -> @a.remove()
 
 	# private functions
 	constructor: (text) ->
@@ -749,9 +764,9 @@ class TextActor extends Actor
 		@color = Color.white
 		@scale = 1
 	update: ->
-		@v.d @duration if @ticks == 0
-		Display.drawText @text, @p.x, @p.y, @xAlign, 0, @color, @scale
-		@r if @ticks >= @duration - 1
+		@vel.d @duration if @ticks == 0
+		Display.drawText @text, @pos.x, @pos.y, @xAlign, 0, @color, @scale
+		@remove() if @ticks >= @duration - 1
 class Letter
 	@initialize: ->
 		@COUNT = 66
@@ -856,7 +871,7 @@ class ParticleActor extends Actor
 		@setDisplayPriority 0
 	update: ->
 		if @particle?
-			@r
+			@remove()
 			pp = @particle
 			return if pp.number < 1
 			ww = pp.wayWidth / 2
@@ -870,7 +885,9 @@ class ParticleActor extends Actor
 				p.duration = pp.duration * (0.5.rr 1.5)
 			return
 		Display.fillRect @p.x, @p.y, @size, @size, @color
-		@r if @ticks >= @duration - 1
+		if @ticks >= @duration - 1
+			console.log "should remove particle actor"
+			@remove()
 
 # mouse/touch position and event
 class Mouse
@@ -1243,8 +1260,52 @@ class Config
 	@soundTempo: 120
 	@soundVolume: 0.02
 	@title: ['MGL.', 'COFFEE']
+	@lineNoise: true
+	@getter 'allowLineNoise', -> @lineNoise
+	@setter 'allowLineNoise', (value) ->
+		@lineNoise = value
+		if(!@lineNoise)
+			DisableLineNoise()
+		else
+			EnableLineNoise()
+
 	#@isDebuggingMode: true
 	#@captureArgs: [1, 3, 0.05]
+
+# functions to allow for the line noise style
+# of programming from the original MGL
+
+# store the original settings so we can drop back to them
+# depending on configuration
+DrawingCore = Drawing
+ActorCore = Actor
+FiberCore = Fiber
+A = ""
+C = ""
+G = ""
+M = ""
+
+EnableLineNoise = ->
+	Drawing = DrawingShorthand
+	Actor = ActorShorthand
+	Fiber = FiberShorthand
+	# short name aliases for classes
+	A = Actor
+	C = Color
+	G = Game
+	M = Mouse
+DisableLineNoise = ->
+	Drawing = DrawingCore
+	Actor = ActorCore
+	Fiber = FiberCore
+	# short name aliases for classes
+	A = AOriginal
+	C = COriginal
+	G = GOriginal
+	M = MOriginal
+
+
+EnableLineNoise()
 
 # aliases for functions
 PI = Math.PI
@@ -1279,8 +1340,3 @@ Number::rr = (to = 1) ->
 Number::randomRangeInt = (args...) -> @.rri args...
 Number::rri = (to = 1) ->
 	Game.r.ri @, to
-# short name aliases for classes
-A = Actor
-C = Color
-G = Game
-M = Mouse
