@@ -1967,49 +1967,28 @@ Key = (function() {
 })();
 
 Sound = (function() {
-  Sound.setSeed = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.sd.apply(this, args);
+  Sound.setSeed = function(seed) {
+    return this.random.setSeed(seed);
   };
 
-  Sound.sd = function(seed) {
-    return this.random.sd(seed);
-  };
-
-  Sound.setQuantize = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.q.apply(this, args);
-  };
-
-  Sound.q = function(quantize) {
+  Sound.setQuantize = function(quantize) {
     this.quantize = quantize != null ? quantize : 1;
   };
 
   function Sound() {
-    Sound.s.push(this);
+    if (this.s == null) {
+      this.s = [];
+    }
+    this.s.push(this);
     this.volume = 1;
   }
 
-  Sound.prototype.setVolume = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.v.apply(this, args);
-  };
-
-  Sound.prototype.v = function(volume) {
+  Sound.prototype.setVolume = function(volume) {
     this.volume = volume;
     return this;
   };
 
-  Sound.prototype.setParam = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.pr.apply(this, args);
-  };
-
-  Sound.prototype.pr = function(param) {
+  Sound.prototype.setParam = function(param) {
     this.param = param;
     if (!Sound.isEnabled) {
       return this;
@@ -2019,13 +1998,7 @@ Sound = (function() {
     return this;
   };
 
-  Sound.prototype.changeParam = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.cpr.apply(this, args);
-  };
-
-  Sound.prototype.cpr = function(index, ratio) {
+  Sound.prototype.changeParam = function(index, ratio) {
     if (!Sound.isEnabled) {
       return this;
     }
@@ -2034,13 +2007,7 @@ Sound = (function() {
     return this;
   };
 
-  Sound.prototype.setDrum = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.d.apply(this, args);
-  };
-
-  Sound.prototype.d = function(seed) {
+  Sound.prototype.setDrum = function(seed) {
     if (seed == null) {
       seed = 0;
     }
@@ -2048,71 +2015,47 @@ Sound = (function() {
     return this;
   };
 
-  Sound.prototype.setPattern = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.pt.apply(this, args);
-  };
-
-  Sound.prototype.pt = function(pattern, patternInterval) {
+  Sound.prototype.setPattern = function(pattern, patternInterval) {
     this.pattern = pattern;
     this.patternInterval = patternInterval != null ? patternInterval : 0.25;
     return this;
   };
 
-  Sound.prototype.setDrumPattern = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.dp.apply(this, args);
-  };
-
-  Sound.prototype.dp = function(seed, patternInterval) {
+  Sound.prototype.setDrumPattern = function(seed, patternInterval) {
     if (seed == null) {
       seed = 0;
     }
     if (patternInterval == null) {
       patternInterval = 0.25;
     }
-    this.pt(Sound.generateDrumPattern(seed), patternInterval);
+    this.setPattern(Sound.generateDrumPattern(seed), patternInterval);
     return this;
   };
 
   Sound.prototype.play = function() {
-    return this.p;
-  };
-
-  Sound.getter('p', function() {
     if (!Game.running || !Sound.isEnabled) {
       return this;
     }
     this.isPlayingOnce = true;
     return this;
-  });
-
-  Sound.prototype.playNow = function() {
-    return this.pn;
   };
 
-  Sound.getter('pn', function() {
+  Sound.prototype.playNow = function() {
     if (!Game.running || !Sound.isEnabled) {
       return this;
     }
     this.playLater(0);
     return this;
-  });
-
-  Sound.prototype.playPattern = function() {
-    return this.pp;
   };
 
-  Sound.getter('pp', function() {
+  Sound.prototype.playPattern = function() {
     if (!Game.running || !Sound.isEnabled) {
       return this;
     }
     this.isPlayingLoop = true;
     this.scheduledTime = null;
     return this;
-  });
+  };
 
   Sound.generateParam = function(seed, params, mixRatio) {
     var ci, cp, i, p, pl, psl, random, rt, _i, _ref;
@@ -2133,6 +2076,66 @@ Sound = (function() {
       }
     }
     return p;
+  };
+
+  Sound.getter('pn', function() {
+    return this.playNow();
+  });
+
+  Sound.getter('pp', function() {
+    return playPattern();
+  });
+
+  Sound.getter('p', function() {
+    return this.play();
+  });
+
+  Sound.prototype.d = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setDrum.apply(this, args);
+  };
+
+  Sound.prototype.pt = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setPattern.apply(this, args);
+  };
+
+  Sound.prototype.dp = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setDrumPattern.apply(this, args);
+  };
+
+  Sound.prototype.cpr = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.changeParam.apply(this, args);
+  };
+
+  Sound.sd = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setSeed.apply(this, args);
+  };
+
+  Sound.q = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setQuantize.apply(this, args);
+  };
+
+  Sound.prototype.v = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setVolume.apply(this, args);
+  };
+
+  Sound.prototype.pr = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setParam.apply(this, args);
   };
 
   Sound.initialize = function() {

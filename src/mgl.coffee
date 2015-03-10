@@ -965,50 +965,40 @@ class Key
 # sound effect and bgm
 class Sound
 	# public functions
-	@setSeed: (args...) -> @sd args...
-	@sd: (seed) ->
-		@random.sd seed
-	@setQuantize: (args...) -> @q args...
-	@q: (@quantize = 1) ->
+	@setSeed: (seed) ->
+		@random.setSeed seed
+	@setQuantize: (@quantize = 1) ->
 	constructor: ->
-		Sound.s.push @
+		@s = [] if !@s?
+		@s.push @
 		@volume = 1
-	setVolume: (args...) -> @v args...
-	v: (@volume) -> @
-	setParam: (args...) -> @pr args...
-	pr: (@param) ->
+	setVolume: (@volume) -> @
+	setParam: (@param) ->
 		return @ if !Sound.isEnabled
 		@param[2] *= @volume
 		@buffer = WebAudiox.getBufferFromJsfx Sound.c, @param
 		@
-	changeParam: (args...) -> @cpr args...
-	cpr: (index, ratio) ->
+	changeParam: (index, ratio) ->
 		return @ if !Sound.isEnabled
 		@param[index] *= ratio		
 		@buffer = WebAudiox.getBufferFromJsfx Sound.c, @param
 		@
-	setDrum: (args...) -> @d args...
-	d: (seed = 0) ->
+	setDrum: (seed = 0) ->
 		@pr (Sound.generateDrumParam seed)
 		@
-	setPattern: (args...) -> @pt args...
-	pt: (@pattern, @patternInterval = 0.25) -> @
-	setDrumPattern: (args...) -> @dp args...
-	dp: (seed = 0, patternInterval = 0.25) ->
-		@pt (Sound.generateDrumPattern seed), patternInterval
+	setPattern: (@pattern, @patternInterval = 0.25) -> @
+	setDrumPattern: (seed = 0, patternInterval = 0.25) ->
+		@setPattern (Sound.generateDrumPattern seed), patternInterval
 		@
-	play: -> @p
-	@getter 'p', ->
+	play: -> 
 		return @ if !Game.running || !Sound.isEnabled
 		@isPlayingOnce = true
 		@
-	playNow: -> @pn
-	@getter 'pn', ->
+	playNow: -> 
 		return @ if !Game.running || !Sound.isEnabled
 		@playLater 0
 		@
-	playPattern: -> @pp
-	@getter 'pp', ->
+	playPattern: ->
 		return @ if !Game.running || !Sound.isEnabled
 		@isPlayingLoop = true
 		@scheduledTime = null
@@ -1026,7 +1016,19 @@ class Sound
 				rt = random.r()
 				p[i] = p[i] * rt + cp[i] * (1 - rt)
 		p
-	
+	#shorthand
+	@getter 'pn', -> @playNow()
+	@getter 'pp', -> playPattern()
+	@getter 'p', -> @play()
+	d: (args...) -> @setDrum args...
+	pt: (args...) -> @setPattern args...
+	dp: (args...) -> @setDrumPattern args...
+	cpr: (args...) -> @changeParam args...
+	@sd: (args...) -> @setSeed args...
+	@q: (args...) -> @setQuantize args...
+	v: (args...) -> @setVolume args...
+	pr: (args...) -> @setParam args...
+
 	# private functions
 	@initialize: ->
 		try
