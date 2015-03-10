@@ -280,7 +280,6 @@ class Actor
 				a.p.y = a.p.y.lr minY, maxY if minY < maxY
 	@clear: (targetClasses = null) ->
 		Actor.groups = [] if !Actor.groups?
-		console.log "setting up groups" + Actor.groups
 		if targetClasses == null
 			g.clear() for g in Actor.groups
 			return
@@ -326,7 +325,7 @@ class Actor
 	@getter 'newSound', -> new Sound
 	newText: (text) ->
 		t = new Text text
-		t.pos @pos
+		t.p @pos
 		t
 	@getter 'newVector', -> new Vector
 
@@ -877,16 +876,15 @@ class ParticleActor extends Actor
 			ww = pp.wayWidth / 2
 			for i in [1..pp.number]
 				p = new ParticleActor
-				p.p.v pp.pos
-				p.v.aw pp.way + ((-ww).rr ww),
+				p.pos.v pp.pos
+				p.vel.aw pp.way + ((-ww).rr ww),
 					pp.speed * (0.5.rr 1.5)
 				p.color = pp.color
 				p.size = pp.size
 				p.duration = pp.duration * (0.5.rr 1.5)
 			return
-		Display.fillRect @p.x, @p.y, @size, @size, @color
+		Display.fillRect @pos.x, @pos.y, @size, @size, @color
 		if @ticks >= @duration - 1
-			console.log "should remove particle actor"
 			@remove()
 
 # mouse/touch position and event
@@ -1186,72 +1184,73 @@ class Random
 # 2d vector
 class Vector
 	# public functions
-	setXy: (args...) -> @xy args...
-	xy: (@x = 0, @y = 0) ->
+	setXy: (@x = 0, @y = 0) ->
 		@
-	setNumber: (args...) -> @n args...
-	n: (v = 0) ->
+	setNumber: (v = 0) ->
 		@xy v, v
 		@
-	setValue: (args...) -> @v args...
-	v: (v) ->
+	setValue: (v) ->
 		@x = v.x
 		@y = v.y
 		@
-	add: (args...) -> @a args...
-	a: (v) ->
+	add: (v) ->
 		@x += v.x
 		@y += v.y
 		@
-	sub: (args...) -> @s args...
-	s: (v) ->
+	sub: (v) ->
 		@x -= v.x
 		@y -= v.y
 		@
-	mul: (args...) -> @m args...
-	m: (v) ->
+	mul: (v) ->
 		@x *= v
 		@y *= v
 		@
-	div: (args...) -> @d args...
-	d: (v) ->
+	div: (v) ->
 		@x /= v
 		@y /= v
 		@
-	addWay: (args...) -> @aw args...
-	aw: (way, speed) ->
+	addWay: (way, speed) ->
 		rw = way * PI / 180
 		@x += (sin rw) * speed
 		@y -= (cos rw) * speed
 		@
-	rotate: (args...) -> @rt args...
-	rt: (way) ->
+	rotate: (way) ->
 		return @ if way == 0
 		w = way * PI / 180
 		px = @x
 		@x = @x * (cos w) - @y * (sin w)
 		@y = px * (sin w) + @y * (cos w)
 		@
-	distanceTo: (args...) -> @dt args...
-	dt: (pos) ->
+	distanceTo: (pos) ->
 		ox = pos.x - @x
 		oy = pos.y - @y
 		sqrt ox * ox + oy * oy
-	wayTo: (args...) -> @wt args...
-	wt: (pos) ->
+	wayTo: (pos) ->
 		(atan2 pos.x - @x, -(pos.y - @y)) * 180 / PI
-	isIn: (args...) -> @ii args...
-	ii: (spacing = 0, minX = 0, maxX = 1, minY = 0, maxY = 1) ->
+	isIn: (spacing = 0, minX = 0, maxX = 1, minY = 0, maxY = 1) ->
 		minX - spacing <= @x <= maxX + spacing && 
 		minY - spacing <= @y <= maxY + spacing
-	getWay: (args...) -> @w
-	@getter 'w', ->
+	getWay: ->
 		(atan2 @x, -@y) * 180 / PI
-	getLength: (args...) -> @l
-	@getter 'l', ->
-		sqrt @x * @x + @y * @y
+	getLength: (args...) -> sqrt @x * @x + @y * @y
 	# private functions
 	constructor: (@x = 0, @y = 0) ->
+
+class VectorShorthand extends Vector
+	@getter 'l', (args...)-> @getLength()
+	@getter 'w', (args...) -> @getWay args...
+	wt: (args...) -> @wayTo args...
+	aw: (args...) -> @addWay args...
+	rt: (args...) -> @rotate args...
+	xy: (args...) -> @setXy args...
+	n: (args...) -> @setNumber args...
+	v: (args...) -> @setValue args...
+	ii: (args...) -> @isIn args...
+	dt: (args...) -> @distanceTo args...
+	a: (args...) -> @add args...
+	d: (args...) -> @div args...
+	m: (args...) -> @mul args...
+	s: (args...) -> @sub args...
 
 # game settings
 class Config
@@ -1280,6 +1279,7 @@ class Config
 DrawingCore = Drawing
 ActorCore = Actor
 FiberCore = Fiber
+VectorCore = Vector
 A = ""
 C = ""
 G = ""
@@ -1288,6 +1288,7 @@ M = ""
 EnableLineNoise = ->
 	Drawing = DrawingShorthand
 	Actor = ActorShorthand
+	Vector = VectorShorthand
 	Fiber = FiberShorthand
 	# short name aliases for classes
 	A = Actor
@@ -1298,6 +1299,7 @@ DisableLineNoise = ->
 	Drawing = DrawingCore
 	Actor = ActorCore
 	Fiber = FiberCore
+	Vector = VectorCore
 	# short name aliases for classes
 	A = AOriginal
 	C = COriginal
