@@ -963,43 +963,54 @@ class Key
 			@ip[e.keyCode] = false
 
 # sound effect and bgm
+# sound effect and bgm
 class Sound
 	# public functions
-	@setSeed: (seed) ->
-		@random.setSeed seed
-	@setQuantize: (@quantize = 1) ->
+	@setSeed: (args...) -> @sd args...
+	@sd: (seed) ->
+		@random.sd seed
+	@setQuantize: (args...) -> @q args...
+	@q: (@quantize = 1) ->
 	constructor: ->
-		@s = [] if !@s?
-		@s.push @
+		Sound.s.push @
 		@volume = 1
-	setVolume: (@volume) -> @
-	setParam: (@param) ->
+	setVolume: (args...) -> @v args...
+	v: (@volume) -> @
+	setParam: (args...) -> @pr args...
+	pr: (@param) ->
 		return @ if !Sound.isEnabled
 		@param[2] *= @volume
 		@buffer = WebAudiox.getBufferFromJsfx Sound.c, @param
 		@
-	changeParam: (index, ratio) ->
+	changeParam: (args...) -> @cpr args...
+	cpr: (index, ratio) ->
 		return @ if !Sound.isEnabled
 		@param[index] *= ratio		
 		@buffer = WebAudiox.getBufferFromJsfx Sound.c, @param
 		@
-	setDrum: (seed = 0) ->
+	setDrum: (args...) -> @d args...
+	d: (seed = 0) ->
 		@pr (Sound.generateDrumParam seed)
 		@
-	setPattern: (@pattern, @patternInterval = 0.25) -> @
-	setDrumPattern: (seed = 0, patternInterval = 0.25) ->
-		@setPattern (Sound.generateDrumPattern seed), patternInterval
+	setPattern: (args...) -> @pt args...
+	pt: (@pattern, @patternInterval = 0.25) -> @
+	setDrumPattern: (args...) -> @dp args...
+	dp: (seed = 0, patternInterval = 0.25) ->
+		@pt (Sound.generateDrumPattern seed), patternInterval
 		@
-	play: -> 
-		return @ if !Game.running || !Sound.isEnabled
+	play: -> @p
+	@getter 'p', ->
+		return @ if !Game.ib || !Sound.isEnabled
 		@isPlayingOnce = true
 		@
-	playNow: -> 
-		return @ if !Game.running || !Sound.isEnabled
+	playNow: -> @pn
+	@getter 'pn', ->
+		return @ if !Game.ib || !Sound.isEnabled
 		@playLater 0
 		@
-	playPattern: ->
-		return @ if !Game.running || !Sound.isEnabled
+	playPattern: -> @pp
+	@getter 'pp', ->
+		return @ if !Game.ib || !Sound.isEnabled
 		@isPlayingLoop = true
 		@scheduledTime = null
 		@
@@ -1016,19 +1027,7 @@ class Sound
 				rt = random.r()
 				p[i] = p[i] * rt + cp[i] * (1 - rt)
 		p
-	#shorthand
-	@getter 'pn', -> @playNow()
-	@getter 'pp', -> playPattern()
-	@getter 'p', -> @play()
-	d: (args...) -> @setDrum args...
-	pt: (args...) -> @setPattern args...
-	dp: (args...) -> @setDrumPattern args...
-	cpr: (args...) -> @changeParam args...
-	@sd: (args...) -> @setSeed args...
-	@q: (args...) -> @setQuantize args...
-	v: (args...) -> @setVolume args...
-	pr: (args...) -> @setParam args...
-
+	
 	# private functions
 	@initialize: ->
 		try
@@ -1051,7 +1050,7 @@ class Sound
 	@reset: ->
 		s.reset() for s in @s
 	@update: ->
-		return if Game.isPaused || !Game.running || !@isEnabled
+		return if Game.isPaused || !Game.ib || !@isEnabled
 		ct = @c.currentTime
 		tt = ct + @scheduleInterval
 		s.update ct, tt for s in @s
