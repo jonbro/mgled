@@ -277,10 +277,10 @@ $(function(){
     ErrorReporter.setSourceMap(cssourcemap);
     try{
       CoffeeScript.eval(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
-      saveToStorage();
     }catch(e){
       ErrorReporter.handleError(e);
     }
+    saveToStorage();
   });
   $("#shareClickLink").click(function(){
     saveToGist();
