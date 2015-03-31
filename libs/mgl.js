@@ -1966,6 +1966,86 @@ Key = (function() {
 
 })();
 
+Random = (function() {
+  Random.prototype.r = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.range.apply(this, args);
+  };
+
+  Random.prototype.range = function(from, to) {
+    if (from == null) {
+      from = 0;
+    }
+    if (to == null) {
+      to = 1;
+    }
+    return this.get0to1() * (to - from) + from;
+  };
+
+  Random.prototype.ri = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.rangeInt.apply(this, args);
+  };
+
+  Random.prototype.rangeInt = function(from, to) {
+    if (from == null) {
+      from = 0;
+    }
+    if (to == null) {
+      to = 1;
+    }
+    return floor(this.range(from, to + 1));
+  };
+
+  Random.prototype.pm = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.plusMinus.apply(this, args);
+  };
+
+  Random.getter('plusMinus', function() {
+    return (this.rangeInt(0, 1)) * 2 - 1;
+  });
+
+  Random.prototype.sd = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return this.setSeed.apply(this, args);
+  };
+
+  Random.prototype.setSeed = function(seed) {
+    var seedValue;
+    if (seed == null) {
+      seed = -0x7fffffff;
+    }
+    seedValue = seed === -0x7fffffff ? floor(Math.random() * 0x7fffffff) : seed;
+    this.x = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30));
+    this.y = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 1;
+    this.z = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 2;
+    this.w = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 3;
+    return this;
+  };
+
+  function Random() {
+    this.setSeed();
+  }
+
+  Random.prototype.get0to1 = function() {
+    var t;
+    t = this.x ^ (this.x << 11);
+    this.x = this.y;
+    this.y = this.z;
+    this.z = this.w;
+    this.w = (this.w ^ (this.w >> 19)) ^ (t ^ (t >> 8));
+    return this.w / 0x7fffffff;
+  };
+
+  return Random;
+
+})();
+
 Sound = (function() {
   Sound.setSeed = function() {
     var args;
@@ -1974,7 +2054,7 @@ Sound = (function() {
   };
 
   Sound.sd = function(seed) {
-    return this.random.sd(seed);
+    return this.random = new Random(seed);
   };
 
   Sound.setQuantize = function() {
@@ -1988,6 +2068,9 @@ Sound = (function() {
   };
 
   function Sound() {
+    if (!Sound.s) {
+      Sound.s = [];
+    }
     Sound.s.push(this);
     this.volume = 1;
   }
@@ -2147,6 +2230,7 @@ Sound = (function() {
       error = _error;
       this.isEnabled = false;
     }
+    console.log("initialize new sound");
     this.playInterval = 60 / Config.soundTempo;
     this.scheduleInterval = 1 / Config.fps * 2;
     this.quantize = 0.5;
@@ -2288,86 +2372,6 @@ Sound = (function() {
   };
 
   return Sound;
-
-})();
-
-Random = (function() {
-  Random.prototype.r = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.range.apply(this, args);
-  };
-
-  Random.prototype.range = function(from, to) {
-    if (from == null) {
-      from = 0;
-    }
-    if (to == null) {
-      to = 1;
-    }
-    return this.get0to1() * (to - from) + from;
-  };
-
-  Random.prototype.ri = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.rangeInt.apply(this, args);
-  };
-
-  Random.prototype.rangeInt = function(from, to) {
-    if (from == null) {
-      from = 0;
-    }
-    if (to == null) {
-      to = 1;
-    }
-    return floor(this.range(from, to + 1));
-  };
-
-  Random.prototype.pm = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.plusMinus.apply(this, args);
-  };
-
-  Random.getter('plusMinus', function() {
-    return (this.rangeInt(0, 1)) * 2 - 1;
-  });
-
-  Random.prototype.sd = function() {
-    var args;
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.setSeed.apply(this, args);
-  };
-
-  Random.prototype.setSeed = function(seed) {
-    var seedValue;
-    if (seed == null) {
-      seed = -0x7fffffff;
-    }
-    seedValue = seed === -0x7fffffff ? floor(Math.random() * 0x7fffffff) : seed;
-    this.x = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30));
-    this.y = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 1;
-    this.z = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 2;
-    this.w = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 3;
-    return this;
-  };
-
-  function Random() {
-    this.setSeed();
-  }
-
-  Random.prototype.get0to1 = function() {
-    var t;
-    t = this.x ^ (this.x << 11);
-    this.x = this.y;
-    this.y = this.z;
-    this.z = this.w;
-    this.w = (this.w ^ (this.w >> 19)) ^ (t ^ (t >> 8));
-    return this.w / 0x7fffffff;
-  };
-
-  return Random;
 
 })();
 

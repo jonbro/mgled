@@ -962,16 +962,50 @@ class Key
 		window.onkeyup = (e) =>
 			@ip[e.keyCode] = false
 
+# random number generator
+class Random
+	# public functions
+	r: (args...) -> @range args...
+	range: (from = 0, to = 1) ->
+		@get0to1() * (to - from) + from
+	ri: (args...) -> @rangeInt args...
+	rangeInt: (from = 0, to = 1) ->
+		floor(@range from, to + 1)
+	pm: (args...) -> @plusMinus args...
+	@getter 'plusMinus', ->
+		(@rangeInt 0, 1) * 2 - 1
+	sd: (args...) -> @setSeed args...
+	setSeed: (seed = -0x7fffffff) ->
+		seedValue = if seed == -0x7fffffff
+			floor Math.random() * 0x7fffffff
+		else
+			seed
+		@x = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30))
+		@y = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 1
+		@z = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 2
+		@w = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 3
+		@
+	# private functions
+	constructor: -> @setSeed()
+	get0to1: -> 
+		t = @x ^ (@x << 11)
+		@x = @y
+		@y = @z
+		@z = @w
+		@w = (@w ^ (@w >> 19)) ^ (t ^ (t >> 8))
+		@w / 0x7fffffff
+
 # sound effect and bgm
 # sound effect and bgm
 class Sound
 	# public functions
 	@setSeed: (args...) -> @sd args...
 	@sd: (seed) ->
-		@random.sd seed
+		@random = new Random(seed)
 	@setQuantize: (args...) -> @q args...
 	@q: (@quantize = 1) ->
 	constructor: ->
+		if !Sound.s then Sound.s = []
 		Sound.s.push @
 		@volume = 1
 	setVolume: (args...) -> @v args...
@@ -1038,6 +1072,7 @@ class Sound
 			@isEnabled = true
 		catch error
 			@isEnabled = false
+		console.log ("initialize new sound")
 		@playInterval = 60 / Config.soundTempo
 		@scheduleInterval = 1 / Config.fps * 2
 		@quantize = 0.5
@@ -1148,39 +1183,6 @@ class Sound
 		s.connect Sound.gn
 		s.start = s.start || s.noteOn
 		s.start delay
-
-# random number generator
-class Random
-	# public functions
-	r: (args...) -> @range args...
-	range: (from = 0, to = 1) ->
-		@get0to1() * (to - from) + from
-	ri: (args...) -> @rangeInt args...
-	rangeInt: (from = 0, to = 1) ->
-		floor(@range from, to + 1)
-	pm: (args...) -> @plusMinus args...
-	@getter 'plusMinus', ->
-		(@rangeInt 0, 1) * 2 - 1
-	sd: (args...) -> @setSeed args...
-	setSeed: (seed = -0x7fffffff) ->
-		seedValue = if seed == -0x7fffffff
-			floor Math.random() * 0x7fffffff
-		else
-			seed
-		@x = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30))
-		@y = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 1
-		@z = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 2
-		@w = seedValue = 1812433253 * (seedValue ^ (seedValue >> 30)) + 3
-		@
-	# private functions
-	constructor: -> @setSeed()
-	get0to1: -> 
-		t = @x ^ (@x << 11)
-		@x = @y
-		@y = @z
-		@z = @w
-		@w = (@w ^ (@w >> 19)) ^ (t ^ (t >> 8))
-		@w / 0x7fffffff
 
 # 2d vector
 class Vector
