@@ -3,6 +3,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>MGLEd</title>
+    <script src="./libs/jszip.js"></script>
+    <script src="./libs/jszip-utils.js"></script>
+    <script src="./libs/FileSaver.js"></script>
     <script src="./libs/jquery-2.1.1.min.js"></script>
     <script src="./libs/stacktrace.js"></script>
     <script src="./libs/source-map.min.js"></script>
@@ -14,7 +17,8 @@
     <script src="./libs/NeuQuant.js"></script>
     <script src="./libs/GIFEncoder.js"></script>
     <script src="./libs/b64.js"></script>
-    <script src="./libs/mgl.js"></script>
+    <!-- <script src="./libs/mgl.js"></script> -->
+    <script src="./libs/mglOrig.js"></script>
     <script src="./libs/coffee-script.js"></script>
     <script src="./libs/codemirror.js"></script>
     <script src="./libs/coffeescript_mode.js"></script>
@@ -47,6 +51,7 @@
     </form>
  -->    <a id="runClickLink">RUN</a>
     <a id="shareClickLink" href="javascript:void('Generate Link To Game');">SHARE</a>
+    <a id="exportClickLink" href="#">EXPORT</a>
     <a target="_blank" href="https://github.com/abagames/mgl.coffee">DOCS</a>
 </div>
 <div id="righttophalf"> 
