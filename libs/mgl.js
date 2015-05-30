@@ -1294,7 +1294,6 @@ Fiber = (function() {
   };
 
   Fiber.prototype.doOnce = function(func) {
-    console.log(this.funcs, func);
     this.funcs.push((function(_this) {
       return function() {
         func.call(_this);
@@ -1339,7 +1338,6 @@ Fiber = (function() {
   }
 
   Fiber.prototype.update = function() {
-    console.log(this.funcIndex);
     return this.funcs[this.funcIndex].call(this);
   };
 
