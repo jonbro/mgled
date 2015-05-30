@@ -192,6 +192,7 @@ Game = (function() {
 
   Game.initialize = function() {
     var ca;
+    console.log("initializing game");
     this.ticks = 0;
     this.score = 0;
     this.running = false;
@@ -648,28 +649,28 @@ Actor = (function() {
     return isCollided;
   };
 
-  Actor.getter('newDrawing', function() {
+  Actor.prototype.newDrawing = function() {
     return new Drawing;
-  });
+  };
 
-  Actor.getter('newFiber', function() {
+  Actor.prototype.newFiber = function() {
     var f;
     f = new Fiber;
     f.a = this;
     this.fibers.push(f);
     return f;
-  });
+  };
 
-  Actor.getter('newParticle', function() {
+  Actor.prototype.newParticle = function() {
     var p;
     p = new Particle;
     p.p(this.p);
     return p;
-  });
+  };
 
-  Actor.getter('newRandom', function() {
+  Actor.prototype.newRandom = function() {
     return new Random;
-  });
+  };
 
   Actor.prototype.newSound = function() {
     return new Sound;
@@ -682,9 +683,9 @@ Actor = (function() {
     return t;
   };
 
-  Actor.getter('newVector', function() {
+  Actor.prototype.newVector = function() {
     return new Vector;
-  });
+  };
 
   Actor.prototype.initialize = function() {};
 
@@ -1293,6 +1294,7 @@ Fiber = (function() {
   };
 
   Fiber.prototype.doOnce = function(func) {
+    console.log(this.funcs, func);
     this.funcs.push((function(_this) {
       return function() {
         func.call(_this);
@@ -1337,6 +1339,7 @@ Fiber = (function() {
   }
 
   Fiber.prototype.update = function() {
+    console.log(this.funcIndex);
     return this.funcs[this.funcIndex].call(this);
   };
 
@@ -2230,7 +2233,6 @@ Sound = (function() {
       error = _error;
       this.isEnabled = false;
     }
-    console.log("initialize new sound");
     this.playInterval = 60 / Config.soundTempo;
     this.scheduleInterval = 1 / Config.fps * 2;
     this.quantize = 0.5;

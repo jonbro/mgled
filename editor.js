@@ -59,6 +59,7 @@ var ErrorReporter = (function(){
         line: stack[0].line+1,
         column: stack[0].column+1
       });
+      console.log(e);
       console.log(coffeescriptErrorPosition);
       var editor = this.editor;
       EditorConsole.clear();
@@ -78,8 +79,9 @@ $(function(){
       Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
     }
   }
+
   var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-    extraKeys: { Tab: betterTab },
+    extraKeys: { Tab: betterTab, "Ctrl-Space": "autocomplete"},
     lineNumbers: true,
     tabSize: 2,
     mode: {name: "coffeescript"},
@@ -272,6 +274,11 @@ $(function(){
   editor.on('change', function(){
     checkEditorDirty();
   });
+  editor.on('keyup', function(e, s){
+    // CodeMirror.commands.autocomplete(e);
+
+    // CodeMirror.hint.coffeescript(e);
+  });
   $("#saveClickLink").click(function(){
     // need to eval to insert stuff into the global namespace, so we can get the name out
     var cssourcemap = CoffeeScript.compile(editor.doc.getValue(), {sandbox:true, sourceMap:true, filename:"none"});
@@ -299,8 +306,9 @@ $(function(){
       try{
         // shouldn't have hit errors, so run the game
         EditorConsole.appendNotice('running game');
-        window.initialize();
         Game.initialize();
+        if(window && window.initialize)
+          window.initialize();
         resize_all();
       }catch(e){
         console.log('handling error I think?');

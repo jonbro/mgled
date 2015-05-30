@@ -58,6 +58,7 @@ class Game
 
 	# private functions
 	@initialize: ->
+		console.log("initializing game")
 		@ticks = 0
 		@score = 0
 		@running = false
@@ -311,23 +312,23 @@ class Actor
 				isCollided = true
 				handler? cca
 		isCollided
-	@getter 'newDrawing', -> new Drawing
-	@getter 'newFiber', ->
+	newDrawing: -> new Drawing
+	newFiber: ->
 		f = new Fiber
 		f.a = @
 		@fibers.push f
 		f
-	@getter 'newParticle', ->
+	newParticle: ->
 		p = new Particle
 		p.p @p
 		p
-	@getter 'newRandom', -> new Random
+	newRandom: -> new Random
 	newSound: -> new Sound
 	newText: (text) ->
 		t = new Text text
 		t.p @pos
 		t
-	@getter 'newVector', -> new Vector
+	newVector: -> new Vector
 
 	# functions should be overrided
 	# initialize (called once per class)
@@ -633,6 +634,7 @@ class Fiber
 		@funcs.push func
 		@
 	doOnce: (func) ->
+		console.log(@funcs, func)
 		@funcs.push =>
 			func.call @
 			@n
@@ -655,6 +657,7 @@ class Fiber
 		@funcIndex = 0
 		@removing = false
 	update: ->
+		console.log (@funcIndex)
 		@funcs[@funcIndex].call @
 
 class FiberShorthand extends Fiber
@@ -1072,7 +1075,6 @@ class Sound
 			@isEnabled = true
 		catch error
 			@isEnabled = false
-		console.log ("initialize new sound")
 		@playInterval = 60 / Config.soundTempo
 		@scheduleInterval = 1 / Config.fps * 2
 		@quantize = 0.5
