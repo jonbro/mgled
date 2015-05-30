@@ -173,6 +173,32 @@ $(function(){
       EditorConsole.appendNotice('play at <a href="'+playUrl+'">'+playUrl+'</a>');
     });
   }
+
+  var exportToFile = function() {
+    //game.zip contains a setup page that the game can use
+    JSZipUtils.getBinaryContent('game.zip', function(err, data) {
+      if(err) {
+        return;
+      }
+
+      var zip = new JSZip(data);
+
+      //Add the compiled JavaScript to the zip file
+      var jsCode = CoffeeScript.compile(editor.doc.getValue());
+      zip.file("main.js", jsCode);
+
+      //Also add the original CoffeeScript file to the zip 
+      //Like, in-case someone wants that 
+      var srcCode = editor.doc.getValue();
+      zip.file("main.coffee", srcCode);
+
+      //Generate and save the file
+      var content = zip.generate({type:"blob"});
+      saveAs(content, "Game.zip");
+
+    });
+  }
+
   function dateToReadable(title,time) {
     var year = time.getFullYear();
     var month = time.getMonth()+1;
@@ -293,6 +319,9 @@ $(function(){
   });
   $("#shareClickLink").click(function(){
     saveToGist();
+  });
+  $("#exportClickLink").click(function() {
+    exportToFile();
   });
   $("#runClickLink").click(function(){
     // take the code in the editor window and run it through coffeescript, then run the game

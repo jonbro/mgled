@@ -634,7 +634,6 @@ class Fiber
 		@funcs.push func
 		@
 	doOnce: (func) ->
-		console.log(@funcs, func)
 		@funcs.push =>
 			func.call @
 			@n
@@ -657,7 +656,6 @@ class Fiber
 		@funcIndex = 0
 		@removing = false
 	update: ->
-		console.log (@funcIndex)
 		@funcs[@funcIndex].call @
 
 class FiberShorthand extends Fiber
